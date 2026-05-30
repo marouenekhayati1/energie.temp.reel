@@ -23,7 +23,7 @@ const NAME = {
   W3pGNRR01012: "Auxiliaire"
 };
 
-// 🔥 HISTORIQUE (persistant)
+// 🔥 HISTORIQUE
 let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
 
 // 📊 CHART
@@ -52,13 +52,25 @@ const chart = new Chart(ctx, {
   },
   options: {
     responsive: true,
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          color: "white",
+          maxRotation: 0,
+          autoSkip: true
+        }
+      },
+      y: {
+        ticks: { color: "white" }
+      }
+    }
   }
 });
 
-// 🔁 charger historique au start
+// 🔁 restore history
 history.forEach(h => {
-  chart.data.labels.push(h.time);
+  chart.data.labels.push(h.label);
   chart.data.datasets[0].data.push(h.conso);
   chart.data.datasets[1].data.push(h.prod);
 });
@@ -70,19 +82,9 @@ function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
-// 💾 save history
-function saveHistory(conso, prod, time) {
-  history.push({ time, conso, prod });
-
-  if (history.length > 50) history.shift();
-
-  localStorage.setItem("watt_history", JSON.stringify(history));
-}
-
-// 🕒 date + heure format
-function getTime() {
+// 🕒 full date (storage)
+function fullTime() {
   const now = new Date();
-
   return (
     now.getDate().toString().padStart(2, "0") + "/" +
     (now.getMonth() + 1).toString().padStart(2, "0") + " " +
@@ -92,7 +94,26 @@ function getTime() {
   );
 }
 
-// 🚀 MAIN LOOP
+// 🕒 chart label (simple)
+function shortTime() {
+  const now = new Date();
+  return (
+    now.getHours().toString().padStart(2, "0") + ":" +
+    now.getMinutes().toString().padStart(2, "0") + ":" +
+    now.getSeconds().toString().padStart(2, "0")
+  );
+}
+
+// 💾 save
+function saveHistory(label, conso, prod) {
+  history.push({ label, conso, prod });
+
+  if (history.length > 50) history.shift();
+
+  localStorage.setItem("watt_history", JSON.stringify(history));
+}
+
+// 🚀 MAIN
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -110,4 +131,63 @@ async function load() {
     raw.forEach(d => {
       const id = d.deviceId || d.device_id;
       const val = d.all_value || d.value || 0;
-      map[id] = to
+      map[id] = toKw(val);
+    });
+
+    const g1 = map["W3pGNRR01016"] || 0;
+    const g2 = map["W3pGNRR01017"] || 0;
+    const randa = map["W3pGNRR01014"] || 0;
+    const bvm = map["W3pGNRR01015"] || 0;
+    const smt = map["W3pGNRR01013"] || 0;
+    const aux = (map["W3pGNRR01012"] || 0) * 2;
+
+    const conso = randa + bvm + smt + aux;
+    const prod = g1 + g2;
+
+    const label = shortTime();   // 👈 GRAPH
+    const full = fullTime();     // 👈 STORAGE
+
+    // UI
+    document.getElementById("conso").innerText = conso.toFixed(2);
+    document.getElementById("prod").innerText = prod.toFixed(2);
+    document.getElementById("delta").innerText = (prod - conso).toFixed(2);
+
+    // devices
+    let html = "";
+    ORDER.forEach(id => {
+      let v = map[id] || 0;
+      if (id === "W3pGNRR01012") v = v * 2;
+
+      html += `
+        <div class="device">
+          <b>${NAME[id]}</b><br/>
+          ${v.toFixed(2)} kW
+        </div>
+      `;
+    });
+
+    document.getElementById("devices").innerHTML = html;
+
+    // 📊 GRAPH
+    chart.data.labels.push(label);
+    chart.data.datasets[0].data.push(conso);
+    chart.data.datasets[1].data.push(prod);
+
+    if (chart.data.labels.length > 40) {
+      chart.data.labels.shift();
+      chart.data.datasets[0].data.shift();
+      chart.data.datasets[1].data.shift();
+    }
+
+    chart.update();
+
+    // 💾 SAVE FULL DATE + LABEL
+    saveHistory(label, conso, prod);
+
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+load();
+setInterval(load, 5000);
