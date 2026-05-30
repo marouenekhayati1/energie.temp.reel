@@ -5,7 +5,6 @@ const DEVICEKEY = "PUT_YOUR_DEVICE_KEY";
 const URL =
 `https://325qd9g4o9.execute-api.us-east-2.amazonaws.com/dev/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/${USER_ID}/${USER_ID}/tri`;
 
-// order affichage
 const ORDER = [
   "W3pGNRR01016",
   "W3pGNRR01017",
@@ -24,7 +23,10 @@ const NAME = {
   W3pGNRR01012: "Auxiliaire"
 };
 
-// chart
+// 🔥 HISTORIQUE (IMPORTANT)
+let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
+
+// 📊 CHART
 const ctx = document.getElementById("chart").getContext("2d");
 
 const chart = new Chart(ctx, {
@@ -32,37 +34,73 @@ const chart = new Chart(ctx, {
   data: {
     labels: [],
     datasets: [
-      { label: "Conso", data: [], borderColor: "#facc15" },
-      { label: "Prod", data: [], borderColor: "#22c55e" }
+      {
+        label: "Consommation",
+        data: [],
+        borderColor: "#ef4444", // rouge
+        tension: 0.4,
+        fill: false
+      },
+      {
+        label: "Production",
+        data: [],
+        borderColor: "#22c55e", // vert
+        tension: 0.4,
+        fill: false
+      }
     ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false
   }
 });
 
+// 🔁 LOAD OLD HISTORY
+history.forEach(h => {
+  chart.data.labels.push(h.time);
+  chart.data.datasets[0].data.push(h.conso);
+  chart.data.datasets[1].data.push(h.prod);
+});
+
+chart.update();
+
+// ⚡ convert watt → kw
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
+// 💾 save history
+function saveHistory(conso, prod) {
+  history.push({
+    time: new Date().toLocaleTimeString(),
+    conso,
+    prod
+  });
+
+  if (history.length > 50) history.shift();
+
+  localStorage.setItem("watt_history", JSON.stringify(history));
+}
+
+// 🚀 MAIN LOAD
 async function load() {
   try {
     const res = await fetch(URL, {
       headers: {
         accesstoken: TOKEN,
         devicekey: DEVICEKEY,
-        userregion: "us-east-2",
-        Accept: "application/json"
+        userregion: "us-east-2"
       }
     });
 
     const raw = await res.json();
-
-    console.log("RAW API:", raw);
 
     const map = {};
 
     raw.forEach(d => {
       const id = d.deviceId || d.device_id;
       const val = d.all_value || d.value || 0;
-
       map[id] = toKw(val);
     });
 
@@ -77,16 +115,15 @@ async function load() {
     const prod = g1 + g2;
     const delta = prod - conso;
 
+    // UI values
     document.getElementById("conso").innerText = conso.toFixed(2);
     document.getElementById("prod").innerText = prod.toFixed(2);
     document.getElementById("delta").innerText = delta.toFixed(2);
 
-    // devices UI FIXED
+    // devices
     let html = "";
-
     ORDER.forEach(id => {
       let v = map[id] || 0;
-
       if (id === "W3pGNRR01012") v = v * 2;
 
       html += `
@@ -99,8 +136,10 @@ async function load() {
 
     document.getElementById("devices").innerHTML = html;
 
-    // graph
-    chart.data.labels.push(new Date().toLocaleTimeString());
+    // 📊 GRAPH UPDATE (flux)
+    const time = new Date().toLocaleTimeString();
+
+    chart.data.labels.push(time);
     chart.data.datasets[0].data.push(conso);
     chart.data.datasets[1].data.push(prod);
 
@@ -112,13 +151,14 @@ async function load() {
 
     chart.update();
 
-    document.getElementById("status").innerText = "Live ✔";
+    // 💾 SAVE HISTORY (NO RESET AFTER REFRESH)
+    saveHistory(conso, prod);
 
   } catch (e) {
-    console.log(e);
-    document.getElementById("status").innerText = "Erreur API";
+    console.log("API ERROR:", e);
   }
 }
 
+// start
 load();
 setInterval(load, 5000);
