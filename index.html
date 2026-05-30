@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>⚡ WattNow Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -19,9 +20,14 @@
   <div class="card">Delta<br><div id="delta" class="value">0</div></div>
 </div>
 
+<h3>Devices</h3>
+<div class="devices" id="devices"></div>
+
 <div class="chart-container">
   <canvas id="chart"></canvas>
 </div>
+
+<div class="status" id="status">Loading...</div>
 
 <script src="script.js"></script>
 
