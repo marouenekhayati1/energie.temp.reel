@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.value {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.chart-container {
+  background: #0b1220;
+  padding: 15px;
+  border-radius: 12px;
+  height: 340px;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 📱 mobile */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    height: 260px;
+  }
+}
