@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ WattNow Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2>⚡ WattNow Dashboard</h2>
+
+<div class="grid">
+  <div class="card">Conso<br><div id="conso" class="value">0</div></div>
+  <div class="card">Prod<br><div id="prod" class="value">0</div></div>
+  <div class="card">Delta<br><div id="delta" class="value">0</div></div>
+</div>
+
+<div class="chart-container">
+  <canvas id="chart"></canvas>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
