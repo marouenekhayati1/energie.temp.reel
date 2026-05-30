@@ -23,7 +23,7 @@ const NAME = {
   W3pGNRR01012: "Auxiliaire"
 };
 
-// 🔥 HISTORIQUE
+// 🔥 history (no reset after refresh)
 let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
 
 // 📊 CHART
@@ -49,71 +49,42 @@ const chart = new Chart(ctx, {
         fill: false
       }
     ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        ticks: {
-          color: "white",
-          maxRotation: 0,
-          autoSkip: true
-        }
-      },
-      y: {
-        ticks: { color: "white" }
-      }
-    }
   }
 });
 
-// 🔁 restore history
+// restore history
 history.forEach(h => {
-  chart.data.labels.push(h.label);
+  chart.data.labels.push(h.time);
   chart.data.datasets[0].data.push(h.conso);
   chart.data.datasets[1].data.push(h.prod);
 });
 
 chart.update();
 
-// ⚡ conversion
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
-// 🕒 full date (storage)
-function fullTime() {
-  const now = new Date();
+// 🕒 TIME FORMAT (flux)
+function getTime() {
+  const d = new Date();
   return (
-    now.getDate().toString().padStart(2, "0") + "/" +
-    (now.getMonth() + 1).toString().padStart(2, "0") + " " +
-    now.getHours().toString().padStart(2, "0") + ":" +
-    now.getMinutes().toString().padStart(2, "0") + ":" +
-    now.getSeconds().toString().padStart(2, "0")
+    d.getHours().toString().padStart(2, "0") + ":" +
+    d.getMinutes().toString().padStart(2, "0") + ":" +
+    d.getSeconds().toString().padStart(2, "0")
   );
 }
 
-// 🕒 chart label (simple)
-function shortTime() {
-  const now = new Date();
-  return (
-    now.getHours().toString().padStart(2, "0") + ":" +
-    now.getMinutes().toString().padStart(2, "0") + ":" +
-    now.getSeconds().toString().padStart(2, "0")
-  );
-}
-
-// 💾 save
-function saveHistory(label, conso, prod) {
-  history.push({ label, conso, prod });
+// 💾 save history
+function saveHistory(time, conso, prod) {
+  history.push({ time, conso, prod });
 
   if (history.length > 50) history.shift();
 
   localStorage.setItem("watt_history", JSON.stringify(history));
 }
 
-// 🚀 MAIN
+// 🚀 MAIN LOOP
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -143,14 +114,12 @@ async function load() {
 
     const conso = randa + bvm + smt + aux;
     const prod = g1 + g2;
-
-    const label = shortTime();   // 👈 GRAPH
-    const full = fullTime();     // 👈 STORAGE
+    const delta = prod - conso;
 
     // UI
     document.getElementById("conso").innerText = conso.toFixed(2);
     document.getElementById("prod").innerText = prod.toFixed(2);
-    document.getElementById("delta").innerText = (prod - conso).toFixed(2);
+    document.getElementById("delta").innerText = delta.toFixed(2);
 
     // devices
     let html = "";
@@ -168,8 +137,10 @@ async function load() {
 
     document.getElementById("devices").innerHTML = html;
 
-    // 📊 GRAPH
-    chart.data.labels.push(label);
+    // 📊 FLOW GRAPH
+    const time = getTime();
+
+    chart.data.labels.push(time);
     chart.data.datasets[0].data.push(conso);
     chart.data.datasets[1].data.push(prod);
 
@@ -181,11 +152,11 @@ async function load() {
 
     chart.update();
 
-    // 💾 SAVE FULL DATE + LABEL
-    saveHistory(label, conso, prod);
+    // save
+    saveHistory(time, conso, prod);
 
   } catch (e) {
-    console.log(e);
+    console.log("API ERROR:", e);
   }
 }
 
