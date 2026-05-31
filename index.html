@@ -1,103 +1,47 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>⚡ WattNow Dashboard</title>
+  <meta charset="UTF-8" />
+  <title>Énergie - Historique</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-  padding: 20px;
-}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
 
-h1 { margin-bottom: 15px; }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
+    .chart-box {
+      background: #020617;
+      padding: 15px;
+      border-radius: 12px;
+    }
 
-.card {
-  background: #1e293b;
-  padding: 16px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.value {
-  font-size: 24px;
-  font-weight: bold;
-  margin-top: 6px;
-}
-
-.conso { color: #ef4444; }
-.prod { color: #22c55e; }
-.delta { color: #facc15; }
-
-.devices {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.device {
-  background: #1e293b;
-  padding: 12px;
-  border-radius: 10px;
-}
-
-.chart-container {
-  margin-top: 20px;
-  background: #0b1220;
-  border-radius: 12px;
-  padding: 12px;
-  height: 320px;
-}
-
-canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-</style>
+    canvas {
+      width: 100% !important;
+      height: 350px !important;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>⚡ WattNow Dashboard</h1>
+  <h2>Historique Énergie</h2>
 
-<div class="grid">
-  <div class="card">
-    <div>Consommation</div>
-    <div id="conso" class="value conso">0</div>
+  <div class="chart-box">
+    <canvas id="energyChart"></canvas>
   </div>
 
-  <div class="card">
-    <div>Production</div>
-    <div id="prod" class="value prod">0</div>
-  </div>
-
-  <div class="card">
-    <div>Delta</div>
-    <div id="delta" class="value">0</div>
-  </div>
-</div>
-
-<h3>Devices</h3>
-<div class="devices" id="devices"></div>
-
-<div class="chart-container">
-  <canvas id="chart"></canvas>
-</div>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
