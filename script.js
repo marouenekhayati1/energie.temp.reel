@@ -1,14 +1,14 @@
-const ctx = document.getElementById("energyChart").getContext("2d");
+const ctx = document.getElementById("energyChart");
 
-// Charger historique
+// historique stocké
 let history = JSON.parse(localStorage.getItem("energyHistory")) || {
-  labels: [],
+  labels: [],        // HEURE SEULE
+  dates: [],         // DATE SÉPARÉE
   consumption: [],
   production: []
 };
 
-// Générer date + heure
-function getDateTimeLabel() {
+function addData() {
   const now = new Date();
 
   const heure = now.toLocaleTimeString("fr-FR", {
@@ -18,21 +18,15 @@ function getDateTimeLabel() {
 
   const date = now.toLocaleDateString("fr-FR");
 
-  return `${heure}\n${date}`;
-}
+  history.labels.push(heure);   // ⚠️ PAS DE \n
+  history.dates.push(date);     // date stockée à part
 
-// Ajouter nouvelles valeurs
-function addData() {
-  const consommation = Math.floor(Math.random() * 400 + 200);
-  const production = Math.floor(Math.random() * 400 + 100);
+  history.consumption.push(Math.floor(Math.random() * 400 + 200));
+  history.production.push(Math.floor(Math.random() * 400 + 100));
 
-  history.labels.push(getDateTimeLabel());
-  history.consumption.push(consommation);
-  history.production.push(production);
-
-  // limiter historique
   if (history.labels.length > 20) {
     history.labels.shift();
+    history.dates.shift();
     history.consumption.shift();
     history.production.shift();
   }
@@ -40,7 +34,6 @@ function addData() {
   localStorage.setItem("energyHistory", JSON.stringify(history));
 }
 
-// Créer chart
 const chart = new Chart(ctx, {
   type: "line",
   data: {
@@ -50,19 +43,15 @@ const chart = new Chart(ctx, {
         label: "Consommation",
         data: history.consumption,
         borderColor: "red",
-        backgroundColor: "transparent",
-        borderWidth: 2,
-        tension: 0.2,
-        fill: false
+        fill: false,
+        tension: 0.2
       },
       {
         label: "Production",
         data: history.production,
         borderColor: "green",
-        backgroundColor: "transparent",
-        borderWidth: 2,
-        tension: 0.2,
-        fill: false
+        fill: false,
+        tension: 0.2
       }
     ]
   },
@@ -70,38 +59,36 @@ const chart = new Chart(ctx, {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        labels: {
-          color: "white"
+      tooltip: {
+        callbacks: {
+          title: (items) => {
+            const index = items[0].dataIndex;
+            return history.labels[index]; // heure
+          },
+          afterTitle: (items) => {
+            const index = items[0].dataIndex;
+            return history.dates[index]; // date EN DESSOUS
+          }
         }
+      },
+      legend: {
+        labels: { color: "white" }
       }
     },
     scales: {
       x: {
-        ticks: {
-          color: "white",
-          callback: function(value) {
-            const label = this.getLabelForValue(value);
-            return label.split("\n");
-          }
-        },
-        grid: {
-          color: "#1e293b"
-        }
+        ticks: { color: "white" },
+        grid: { color: "#1e293b" }
       },
       y: {
-        ticks: {
-          color: "white"
-        },
-        grid: {
-          color: "#1e293b"
-        }
+        ticks: { color: "white" },
+        grid: { color: "#1e293b" }
       }
     }
   }
 });
 
-// Ajouter une nouvelle valeur toutes les 10s
+// ajout automatique
 setInterval(() => {
   addData();
   chart.data.labels = history.labels;
