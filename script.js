@@ -40,8 +40,9 @@ const chart = new Chart(ctx, {
         borderColor: "#ef4444",
         borderWidth: 2,
         pointRadius: 2,
-        tension: 0,        // 🔥 IMPORTANT
-        fill: false
+        tension: 0,
+        fill: false,
+        pointStyle: "circle"   // 🔵 cercle
       },
       {
         label: "Production",
@@ -49,20 +50,27 @@ const chart = new Chart(ctx, {
         borderColor: "#22c55e",
         borderWidth: 2,
         pointRadius: 2,
-        tension: 0,        // 🔥 IMPORTANT
-        fill: false
+        tension: 0,
+        fill: false,
+        pointStyle: "circle"   // 🟢 cercle
       }
     ]
   },
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    animation: false,   // 🔥 NO FLUX EFFECT
+    animation: false,
+
     plugins: {
       legend: {
-        labels: { color: "white" }
+        labels: {
+          color: "white",
+          usePointStyle: true,   // 🔥 important
+          pointStyle: "circle"   // légende en cercle
+        }
       }
     },
+
     scales: {
       x: {
         ticks: {
