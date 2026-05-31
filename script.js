@@ -39,20 +39,18 @@ const chart = new Chart(ctx, {
         data: [],
         borderColor: "#ef4444",
         borderWidth: 2,
-        pointRadius: 2,
         tension: 0,
         fill: false,
-        pointStyle: "circle"   // 🔵 cercle
+        pointRadius: 0   // 🔥 clean line only
       },
       {
         label: "Production",
         data: [],
         borderColor: "#22c55e",
         borderWidth: 2,
-        pointRadius: 2,
         tension: 0,
         fill: false,
-        pointStyle: "circle"   // 🟢 cercle
+        pointRadius: 0   // 🔥 clean line only
       }
     ]
   },
@@ -65,8 +63,8 @@ const chart = new Chart(ctx, {
       legend: {
         labels: {
           color: "white",
-          usePointStyle: true,   // 🔥 important
-          pointStyle: "circle"   // légende en cercle
+          usePointStyle: true,
+          pointStyle: "line"   // 🔥 legend as line
         }
       }
     },
@@ -100,7 +98,7 @@ function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
-/* 🕒 TIME CLEAN */
+/* 🕒 TIME */
 function getTime() {
   const d = new Date();
 
@@ -174,7 +172,7 @@ async function load() {
 
     document.getElementById("devices").innerHTML = html;
 
-    /* 📊 GRAPH UPDATE */
+    /* 📊 UPDATE GRAPH */
     const time = getTime();
 
     chart.data.labels.push(time);
