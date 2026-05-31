@@ -23,7 +23,7 @@ const NAME = {
   W3pGNRR01012: "Auxiliaire"
 };
 
-/* 🔥 HISTORIQUE (persistant) */
+/* 🔥 HISTORY */
 let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
 
 /* 📊 CHART */
@@ -38,22 +38,31 @@ const chart = new Chart(ctx, {
         label: "Consommation",
         data: [],
         borderColor: "#ef4444",
-        fill: false,
-        tension: 0          // ❌ PAS DE FLUX
+        borderWidth: 2,
+        pointRadius: 2,
+        tension: 0,        // 🔥 IMPORTANT
+        fill: false
       },
       {
         label: "Production",
         data: [],
         borderColor: "#22c55e",
-        fill: false,
-        tension: 0          // ❌ PAS DE FLUX
+        borderWidth: 2,
+        pointRadius: 2,
+        tension: 0,        // 🔥 IMPORTANT
+        fill: false
       }
     ]
   },
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    animation: false,
+    animation: false,   // 🔥 NO FLUX EFFECT
+    plugins: {
+      legend: {
+        labels: { color: "white" }
+      }
+    },
     scales: {
       x: {
         ticks: {
@@ -65,48 +74,40 @@ const chart = new Chart(ctx, {
       y: {
         ticks: { color: "white" }
       }
-    },
-    plugins: {
-      legend: {
-        labels: { color: "white" }
-      }
     }
   }
 });
 
 /* 🔁 RESTORE HISTORY */
 history.forEach(h => {
-  chart.data.labels.push([h.time, h.date]);
+  chart.data.labels.push(h.time);
   chart.data.datasets[0].data.push(h.conso);
   chart.data.datasets[1].data.push(h.prod);
 });
+
 chart.update();
 
-/* 🔧 UTILS */
+/* 🔧 TO KW */
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
-function getTimeDate() {
+/* 🕒 TIME CLEAN */
+function getTime() {
   const d = new Date();
 
-  const time =
-    d.getHours().toString().padStart(2, "0") + ":" +
-    d.getMinutes().toString().padStart(2, "0") + ":" +
-    d.getSeconds().toString().padStart(2, "0");
-
-  const date =
-    d.getDate().toString().padStart(2, "0") + "/" +
-    (d.getMonth() + 1).toString().padStart(2, "0") + "/" +
-    d.getFullYear();
-
-  return { time, date };
+  return d.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
 }
 
-function saveHistory(time, date, conso, prod) {
-  history.push({ time, date, conso, prod });
+/* 💾 SAVE HISTORY */
+function saveHistory(time, conso, prod) {
+  history.push({ time, conso, prod });
 
-  if (history.length > 40) history.shift();
+  if (history.length > 50) history.shift();
 
   localStorage.setItem("watt_history", JSON.stringify(history));
 }
@@ -123,6 +124,7 @@ async function load() {
     });
 
     const raw = await res.json();
+
     const map = {};
 
     raw.forEach(d => {
@@ -149,6 +151,7 @@ async function load() {
 
     /* DEVICES */
     let html = "";
+
     ORDER.forEach(id => {
       let v = map[id] || 0;
       if (id === "W3pGNRR01012") v *= 2;
@@ -160,12 +163,13 @@ async function load() {
         </div>
       `;
     });
+
     document.getElementById("devices").innerHTML = html;
 
-    /* 📊 GRAPH */
-    const { time, date } = getTimeDate();
+    /* 📊 GRAPH UPDATE */
+    const time = getTime();
 
-    chart.data.labels.push([time, date]);
+    chart.data.labels.push(time);
     chart.data.datasets[0].data.push(conso);
     chart.data.datasets[1].data.push(prod);
 
@@ -177,12 +181,13 @@ async function load() {
 
     chart.update();
 
-    saveHistory(time, date, conso, prod);
+    saveHistory(time, conso, prod);
 
   } catch (e) {
     console.log("API ERROR:", e);
   }
 }
 
+/* START */
 load();
 setInterval(load, 5000);
