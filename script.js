@@ -23,10 +23,10 @@ const NAME = {
   W3pGNRR01012: "Auxiliaire"
 };
 
-// 🔥 history (no reset after refresh)
+/* 🔥 HISTORIQUE (persistant) */
 let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
 
-// 📊 CHART
+/* 📊 CHART */
 const ctx = document.getElementById("chart").getContext("2d");
 
 const chart = new Chart(ctx, {
@@ -38,53 +38,80 @@ const chart = new Chart(ctx, {
         label: "Consommation",
         data: [],
         borderColor: "#ef4444",
-        tension: 0.4,
-        fill: false
+        fill: false,
+        tension: 0          // ❌ PAS DE FLUX
       },
       {
         label: "Production",
         data: [],
         borderColor: "#22c55e",
-        tension: 0.4,
-        fill: false
+        fill: false,
+        tension: 0          // ❌ PAS DE FLUX
       }
     ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    scales: {
+      x: {
+        ticks: {
+          color: "white",
+          maxRotation: 0,
+          autoSkip: true
+        }
+      },
+      y: {
+        ticks: { color: "white" }
+      }
+    },
+    plugins: {
+      legend: {
+        labels: { color: "white" }
+      }
+    }
   }
 });
 
-// restore history
+/* 🔁 RESTORE HISTORY */
 history.forEach(h => {
-  chart.data.labels.push(h.time);
+  chart.data.labels.push([h.time, h.date]);
   chart.data.datasets[0].data.push(h.conso);
   chart.data.datasets[1].data.push(h.prod);
 });
-
 chart.update();
 
+/* 🔧 UTILS */
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
-// 🕒 TIME FORMAT (flux)
-function getTime() {
+function getTimeDate() {
   const d = new Date();
-  return (
+
+  const time =
     d.getHours().toString().padStart(2, "0") + ":" +
     d.getMinutes().toString().padStart(2, "0") + ":" +
-    d.getSeconds().toString().padStart(2, "0")
-  );
+    d.getSeconds().toString().padStart(2, "0");
+
+  const date =
+    d.getDate().toString().padStart(2, "0") + "/" +
+    (d.getMonth() + 1).toString().padStart(2, "0") + "/" +
+    d.getFullYear();
+
+  return { time, date };
 }
 
-// 💾 save history
-function saveHistory(time, conso, prod) {
-  history.push({ time, conso, prod });
+function saveHistory(time, date, conso, prod) {
+  history.push({ time, date, conso, prod });
 
-  if (history.length > 50) history.shift();
+  if (history.length > 40) history.shift();
 
   localStorage.setItem("watt_history", JSON.stringify(history));
 }
 
-// 🚀 MAIN LOOP
+/* 🚀 MAIN LOOP */
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -96,7 +123,6 @@ async function load() {
     });
 
     const raw = await res.json();
-
     const map = {};
 
     raw.forEach(d => {
@@ -116,16 +142,16 @@ async function load() {
     const prod = g1 + g2;
     const delta = prod - conso;
 
-    // UI
+    /* UI */
     document.getElementById("conso").innerText = conso.toFixed(2);
     document.getElementById("prod").innerText = prod.toFixed(2);
     document.getElementById("delta").innerText = delta.toFixed(2);
 
-    // devices
+    /* DEVICES */
     let html = "";
     ORDER.forEach(id => {
       let v = map[id] || 0;
-      if (id === "W3pGNRR01012") v = v * 2;
+      if (id === "W3pGNRR01012") v *= 2;
 
       html += `
         <div class="device">
@@ -134,13 +160,12 @@ async function load() {
         </div>
       `;
     });
-
     document.getElementById("devices").innerHTML = html;
 
-    // 📊 FLOW GRAPH
-    const time = getTime();
+    /* 📊 GRAPH */
+    const { time, date } = getTimeDate();
 
-    chart.data.labels.push(time);
+    chart.data.labels.push([time, date]);
     chart.data.datasets[0].data.push(conso);
     chart.data.datasets[1].data.push(prod);
 
@@ -152,8 +177,7 @@ async function load() {
 
     chart.update();
 
-    // save
-    saveHistory(time, conso, prod);
+    saveHistory(time, date, conso, prod);
 
   } catch (e) {
     console.log("API ERROR:", e);
