@@ -2,46 +2,38 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Énergie - Historique</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historique Énergie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      margin: 0;
-      padding: 20px;
+      background:#0f172a;
+      color:white;
+      font-family:Arial, sans-serif;
+      padding:20px;
     }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .chart-box {
-      background: #020617;
-      padding: 15px;
-      border-radius: 12px;
+    .box {
+      background:#020617;
+      padding:15px;
+      border-radius:12px;
     }
 
     canvas {
-      width: 100% !important;
-      height: 350px !important;
+      height:350px !important;
     }
   </style>
 </head>
-
 <body>
 
-  <h2>Historique Énergie</h2>
+<h2>Historique Énergie</h2>
 
-  <div class="chart-box">
-    <canvas id="energyChart"></canvas>
-  </div>
+<div class="box">
+  <canvas id="energyChart"></canvas>
+</div>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
