@@ -1,14 +1,14 @@
-const ctx = document.getElementById("energyChart");
+const ctx = document.getElementById("chart");
 
-// historique stocké
-let history = JSON.parse(localStorage.getItem("energyHistory")) || {
-  labels: [],        // HEURE SEULE
-  dates: [],         // DATE SÉPARÉE
-  consumption: [],
-  production: []
+// stockage historique
+let history = JSON.parse(localStorage.getItem("history")) || {
+  labels: [],   // heure seulement
+  dates: [],    // date séparée
+  conso: [],
+  prod: []
 };
 
-function addData() {
+function addPoint() {
   const now = new Date();
 
   const heure = now.toLocaleTimeString("fr-FR", {
@@ -18,20 +18,21 @@ function addData() {
 
   const date = now.toLocaleDateString("fr-FR");
 
-  history.labels.push(heure);   // ⚠️ PAS DE \n
-  history.dates.push(date);     // date stockée à part
+  history.labels.push(heure);
+  history.dates.push(date);
 
-  history.consumption.push(Math.floor(Math.random() * 400 + 200));
-  history.production.push(Math.floor(Math.random() * 400 + 100));
+  // données test
+  history.conso.push(Math.floor(Math.random() * 500 + 200));
+  history.prod.push(Math.floor(Math.random() * 500 + 100));
 
   if (history.labels.length > 20) {
     history.labels.shift();
     history.dates.shift();
-    history.consumption.shift();
-    history.production.shift();
+    history.conso.shift();
+    history.prod.shift();
   }
 
-  localStorage.setItem("energyHistory", JSON.stringify(history));
+  localStorage.setItem("history", JSON.stringify(history));
 }
 
 const chart = new Chart(ctx, {
@@ -41,33 +42,38 @@ const chart = new Chart(ctx, {
     datasets: [
       {
         label: "Consommation",
-        data: history.consumption,
+        data: history.conso,
         borderColor: "red",
         fill: false,
-        tension: 0.2
+        tension: 0,                 // 🔥 IMPORTANT
+        stepped: false,
+        cubicInterpolationMode: "default"
       },
       {
         label: "Production",
-        data: history.production,
+        data: history.prod,
         borderColor: "green",
         fill: false,
-        tension: 0.2
+        tension: 0,                 // 🔥 IMPORTANT
+        stepped: false,
+        cubicInterpolationMode: "default"
       }
     ]
   },
   options: {
     responsive: true,
     maintainAspectRatio: false,
+    animation: false,
     plugins: {
       tooltip: {
         callbacks: {
           title: (items) => {
-            const index = items[0].dataIndex;
-            return history.labels[index]; // heure
+            const i = items[0].dataIndex;
+            return history.labels[i]; // heure
           },
           afterTitle: (items) => {
-            const index = items[0].dataIndex;
-            return history.dates[index]; // date EN DESSOUS
+            const i = items[0].dataIndex;
+            return history.dates[i]; // date dessous
           }
         }
       },
@@ -76,23 +82,17 @@ const chart = new Chart(ctx, {
       }
     },
     scales: {
-      x: {
-        ticks: { color: "white" },
-        grid: { color: "#1e293b" }
-      },
-      y: {
-        ticks: { color: "white" },
-        grid: { color: "#1e293b" }
-      }
+      x: { ticks: { color: "white" } },
+      y: { ticks: { color: "white" } }
     }
   }
 });
 
-// ajout automatique
+// update régulier
 setInterval(() => {
-  addData();
+  addPoint();
   chart.data.labels = history.labels;
-  chart.data.datasets[0].data = history.consumption;
-  chart.data.datasets[1].data = history.production;
+  chart.data.datasets[0].data = history.conso;
+  chart.data.datasets[1].data = history.prod;
   chart.update();
-}, 10000);
+}, 5000);
