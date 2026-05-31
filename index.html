@@ -1,37 +1,36 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Historique Énergie</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>WattNow Chart</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
-    body {
-      background:#0f172a;
-      color:white;
-      font-family:Arial, sans-serif;
-      padding:20px;
-    }
-
-    .box {
-      background:#020617;
-      padding:15px;
-      border-radius:12px;
-    }
-
-    canvas {
-      height:350px !important;
-    }
-  </style>
+<style>
+body {
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+.box {
+  background:#020617;
+  padding:15px;
+  border-radius:12px;
+}
+canvas {
+  height:350px !important;
+}
+</style>
 </head>
+
 <body>
 
 <h2>Historique Énergie</h2>
 
 <div class="box">
-  <canvas id="energyChart"></canvas>
+  <canvas id="chart"></canvas>
 </div>
 
 <script src="script.js"></script>
