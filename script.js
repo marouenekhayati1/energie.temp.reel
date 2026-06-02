@@ -38,63 +38,34 @@ const chart = new Chart(ctx, {
         data: [],
         borderColor: "#ef4444",
         borderWidth: 2,
-        tension: 0.2,
-        fill: false,
-
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        pointBackgroundColor: "#ef4444"
+        tension: 0,
+        pointRadius: 0
       },
       {
         label: "Production",
         data: [],
         borderColor: "#22c55e",
         borderWidth: 2,
-        tension: 0.2,
-        fill: false,
-
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        pointBackgroundColor: "#22c55e"
+        tension: 0,
+        pointRadius: 0
       }
     ]
   },
-
   options: {
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
-
     plugins: {
-      legend: {
-        labels: { color: "white" }
-      },
-
-      zoom: {
-        pan: {
-          enabled: true,
-          mode: "x"
-        },
-        zoom: {
-          wheel: { enabled: true },
-          pinch: { enabled: true },
-          mode: "x"
-        }
-      }
+      legend: { labels: { color: "white" } }
     },
-
     scales: {
-      x: {
-        ticks: { color: "white" }
-      },
-      y: {
-        ticks: { color: "white" }
-      }
+      x: { ticks: { color: "white" } },
+      y: { ticks: { color: "white" } }
     }
   }
 });
 
-/* RESTORE */
+/* restore history */
 history.forEach(h => {
   chart.data.labels.push(h.time);
   chart.data.datasets[0].data.push(h.conso);
@@ -103,12 +74,11 @@ history.forEach(h => {
 
 chart.update();
 
-/* HELPERS */
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
-function timeNow() {
+function getTime() {
   return new Date().toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -124,12 +94,14 @@ function saveHistory(time, conso, prod) {
 
 /* STEG */
 function getStegPeriod() {
-  const t = new Date().getHours() + new Date().getMinutes() / 60;
+  const h = new Date().getHours();
+  const m = new Date().getMinutes();
+  const t = h + m / 60;
 
   if (t >= 22 || t < 6.5) return { name: "Nuit", type: "offpeak" };
-  if (t < 11) return { name: "Matin", type: "normal" };
-  if (t < 15) return { name: "Pointe matin", type: "peak" };
-  if (t < 19) return { name: "Après-midi", type: "normal" };
+  if (t >= 6.5 && t < 11) return { name: "Matin", type: "normal" };
+  if (t >= 11 && t < 15) return { name: "Pointe matin", type: "peak" };
+  if (t >= 15 && t < 19) return { name: "Après-midi", type: "normal" };
   return { name: "Pointe soir", type: "peak" };
 }
 
@@ -141,15 +113,15 @@ function updateStegUI() {
   const msg = document.getElementById("stegMessage");
 
   if (p.type === "peak") {
-    msg.innerText = "⚠️ Pointe tarifaire – Démarrer les groupes en pleine charge";
+    msg.innerText = "⚠️ Pointe tarifaire détectée – Démarrer les groupes en pleine charge";
     msg.style.color = "#ef4444";
   } else {
-    msg.innerText = "✅ Hors pointe – Suivre consommation vs production";
+    msg.innerText = "✅ Hors pointe – Suivre la consommation vs production";
     msg.style.color = "#22c55e";
   }
 }
 
-/* API LOOP SAFE */
+/* LOOP SAFE */
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -188,19 +160,21 @@ async function load() {
     let html = "";
 
     ORDER.forEach(id => {
+      let v = map[id] || 0;
+
       html += `
         <div class="device">
           <b>${NAME[id]}</b><br/>
-          ${(map[id] || 0).toFixed(2)} kW
+          ${v.toFixed(2)} kW
         </div>
       `;
     });
 
     document.getElementById("devices").innerHTML = html;
 
-    const t = timeNow();
+    const time = getTime();
 
-    chart.data.labels.push(t);
+    chart.data.labels.push(time);
     chart.data.datasets[0].data.push(conso);
     chart.data.datasets[1].data.push(prod);
 
@@ -212,7 +186,7 @@ async function load() {
 
     chart.update();
 
-    saveHistory(t, conso, prod);
+    saveHistory(time, conso, prod);
 
     updateStegUI();
 
@@ -221,6 +195,6 @@ async function load() {
   }
 }
 
-/* START */
+/* START SAFE LOOP */
 load();
 setInterval(load, 5000);
