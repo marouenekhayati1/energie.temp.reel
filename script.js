@@ -40,6 +40,7 @@ const chart = new Chart(ctx, {
         borderWidth: 2,
         tension: 0.2,
         fill: false,
+
         pointRadius: 4,
         pointHoverRadius: 6,
         pointBackgroundColor: "#ef4444"
@@ -51,6 +52,7 @@ const chart = new Chart(ctx, {
         borderWidth: 2,
         tension: 0.2,
         fill: false,
+
         pointRadius: 4,
         pointHoverRadius: 6,
         pointBackgroundColor: "#22c55e"
@@ -67,8 +69,12 @@ const chart = new Chart(ctx, {
       legend: {
         labels: { color: "white" }
       },
+
       zoom: {
-        pan: { enabled: true, mode: "x" },
+        pan: {
+          enabled: true,
+          mode: "x"
+        },
         zoom: {
           wheel: { enabled: true },
           pinch: { enabled: true },
@@ -78,18 +84,17 @@ const chart = new Chart(ctx, {
     },
 
     scales: {
-      x: { ticks: { color: "white" } },
-      y: { ticks: { color: "white" } }
+      x: {
+        ticks: { color: "white" }
+      },
+      y: {
+        ticks: { color: "white" }
+      }
     }
   }
 });
 
-/* RESET ZOOM */
-function resetZoom() {
-  chart.resetZoom();
-}
-
-/* HISTORY RESTORE */
+/* RESTORE */
 history.forEach(h => {
   chart.data.labels.push(h.time);
   chart.data.datasets[0].data.push(h.conso);
@@ -111,8 +116,8 @@ function timeNow() {
   });
 }
 
-function saveHistory(t, c, p) {
-  history.push({ time: t, conso: c, prod: p });
+function saveHistory(time, conso, prod) {
+  history.push({ time, conso, prod });
   if (history.length > 50) history.shift();
   localStorage.setItem("watt_history", JSON.stringify(history));
 }
@@ -144,7 +149,7 @@ function updateStegUI() {
   }
 }
 
-/* API LOOP */
+/* API LOOP SAFE */
 async function load() {
   try {
     const res = await fetch(URL, {
