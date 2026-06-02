@@ -38,26 +38,45 @@ const chart = new Chart(ctx, {
         data: [],
         borderColor: "#ef4444",
         borderWidth: 2,
-        tension: 0,
-        pointRadius: 0
+        tension: 0.2,
+        fill: false,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: "#ef4444"
       },
       {
         label: "Production",
         data: [],
         borderColor: "#22c55e",
         borderWidth: 2,
-        tension: 0,
-        pointRadius: 0
+        tension: 0.2,
+        fill: false,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: "#22c55e"
       }
     ]
   },
+
   options: {
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
+
     plugins: {
-      legend: { labels: { color: "white" } }
+      legend: {
+        labels: { color: "white" }
+      },
+      zoom: {
+        pan: { enabled: true, mode: "x" },
+        zoom: {
+          wheel: { enabled: true },
+          pinch: { enabled: true },
+          mode: "x"
+        }
+      }
     },
+
     scales: {
       x: { ticks: { color: "white" } },
       y: { ticks: { color: "white" } }
@@ -65,7 +84,12 @@ const chart = new Chart(ctx, {
   }
 });
 
-/* restore history */
+/* RESET ZOOM */
+function resetZoom() {
+  chart.resetZoom();
+}
+
+/* HISTORY RESTORE */
 history.forEach(h => {
   chart.data.labels.push(h.time);
   chart.data.datasets[0].data.push(h.conso);
@@ -74,11 +98,12 @@ history.forEach(h => {
 
 chart.update();
 
+/* HELPERS */
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
 
-function getTime() {
+function timeNow() {
   return new Date().toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -86,22 +111,20 @@ function getTime() {
   });
 }
 
-function saveHistory(time, conso, prod) {
-  history.push({ time, conso, prod });
+function saveHistory(t, c, p) {
+  history.push({ time: t, conso: c, prod: p });
   if (history.length > 50) history.shift();
   localStorage.setItem("watt_history", JSON.stringify(history));
 }
 
 /* STEG */
 function getStegPeriod() {
-  const h = new Date().getHours();
-  const m = new Date().getMinutes();
-  const t = h + m / 60;
+  const t = new Date().getHours() + new Date().getMinutes() / 60;
 
   if (t >= 22 || t < 6.5) return { name: "Nuit", type: "offpeak" };
-  if (t >= 6.5 && t < 11) return { name: "Matin", type: "normal" };
-  if (t >= 11 && t < 15) return { name: "Pointe matin", type: "peak" };
-  if (t >= 15 && t < 19) return { name: "Après-midi", type: "normal" };
+  if (t < 11) return { name: "Matin", type: "normal" };
+  if (t < 15) return { name: "Pointe matin", type: "peak" };
+  if (t < 19) return { name: "Après-midi", type: "normal" };
   return { name: "Pointe soir", type: "peak" };
 }
 
@@ -113,15 +136,15 @@ function updateStegUI() {
   const msg = document.getElementById("stegMessage");
 
   if (p.type === "peak") {
-    msg.innerText = "⚠️ Pointe tarifaire détectée – Démarrer les groupes en pleine charge";
+    msg.innerText = "⚠️ Pointe tarifaire – Démarrer les groupes en pleine charge";
     msg.style.color = "#ef4444";
   } else {
-    msg.innerText = "✅ Hors pointe – Suivre la consommation vs production";
+    msg.innerText = "✅ Hors pointe – Suivre consommation vs production";
     msg.style.color = "#22c55e";
   }
 }
 
-/* LOOP SAFE */
+/* API LOOP */
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -160,21 +183,19 @@ async function load() {
     let html = "";
 
     ORDER.forEach(id => {
-      let v = map[id] || 0;
-
       html += `
         <div class="device">
           <b>${NAME[id]}</b><br/>
-          ${v.toFixed(2)} kW
+          ${(map[id] || 0).toFixed(2)} kW
         </div>
       `;
     });
 
     document.getElementById("devices").innerHTML = html;
 
-    const time = getTime();
+    const t = timeNow();
 
-    chart.data.labels.push(time);
+    chart.data.labels.push(t);
     chart.data.datasets[0].data.push(conso);
     chart.data.datasets[1].data.push(prod);
 
@@ -186,7 +207,7 @@ async function load() {
 
     chart.update();
 
-    saveHistory(time, conso, prod);
+    saveHistory(t, conso, prod);
 
     updateStegUI();
 
@@ -195,6 +216,6 @@ async function load() {
   }
 }
 
-/* START SAFE LOOP */
+/* START */
 load();
 setInterval(load, 5000);
