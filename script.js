@@ -148,8 +148,8 @@ async function load() {
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
 
-    /* ✅ TEST MODE ×100 */
-    const aux = get("W3pGNRR01012") * 100;
+    /* ✅ AUX = ×2 */
+    const aux = get("W3pGNRR01012") * 2;
 
     const conso = randa + bvm + smt + aux;
     const prod = g1 + g2;
@@ -164,9 +164,9 @@ async function load() {
     ORDER.forEach(id => {
       let v = map[id] || 0;
 
-      /* ✅ TEST MODE affichage aussi */
+      /* affichage AUX ×2 */
       if (id === "W3pGNRR01012") {
-        v = v * 100;
+        v = v * 2;
       }
 
       html += `
