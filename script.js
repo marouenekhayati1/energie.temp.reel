@@ -147,7 +147,7 @@ async function load() {
     const randa = get("W3pGNRR01014");
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
-    const aux = get("W3pGNRR01012");
+    const aux = get("W3pGNRR01012")*2;
 
     const conso = randa + bvm + smt + aux;
     const prod = g1 + g2;
