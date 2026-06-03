@@ -74,6 +74,7 @@ history.forEach(h => {
 
 chart.update();
 
+/* helpers */
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
@@ -121,7 +122,7 @@ function updateStegUI() {
   }
 }
 
-/* LOOP */
+/* MAIN LOOP */
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -148,8 +149,9 @@ async function load() {
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
 
-    /* ✅ AUX = ×2 */
-    const aux = get("W3pGNRR01012") * 2;
+    /* ✅ AUX FIX PROPRE */
+    const auxRaw = get("W3pGNRR01012");
+    const aux = auxRaw * 2;
 
     const conso = randa + bvm + smt + aux;
     const prod = g1 + g2;
@@ -164,7 +166,7 @@ async function load() {
     ORDER.forEach(id => {
       let v = map[id] || 0;
 
-      /* affichage AUX ×2 */
+      /* ✅ AUX ×2 UNIQUEMENT ICI */
       if (id === "W3pGNRR01012") {
         v = v * 2;
       }
@@ -192,9 +194,7 @@ async function load() {
     }
 
     chart.update();
-
     saveHistory(time, conso, prod);
-
     updateStegUI();
 
   } catch (e) {
