@@ -121,7 +121,7 @@ function updateStegUI() {
   }
 }
 
-/* LOOP SAFE */
+/* LOOP */
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -148,27 +148,25 @@ async function load() {
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
 
-    /* ✅ AUX FIX ×2 */
-    const aux = get("W3pGNRR01012") * 2;
+    /* ✅ TEST MODE ×100 */
+    const aux = get("W3pGNRR01012") * 100;
 
     const conso = randa + bvm + smt + aux;
     const prod = g1 + g2;
     const delta = prod - conso;
 
-    /* affichage avec unité */
     document.getElementById("conso").innerText = `${conso.toFixed(2)} kW`;
     document.getElementById("prod").innerText = `${prod.toFixed(2)} kW`;
     document.getElementById("delta").innerText = `${delta.toFixed(2)} kW`;
 
-    /* affichage devices avec FIX AUX */
     let html = "";
 
     ORDER.forEach(id => {
       let v = map[id] || 0;
 
-      /* ✅ FIX ICI */
+      /* ✅ TEST MODE affichage aussi */
       if (id === "W3pGNRR01012") {
-        v = v * 2;
+        v = v * 100;
       }
 
       html += `
