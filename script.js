@@ -147,15 +147,18 @@ async function load() {
     const randa = get("W3pGNRR01014");
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
-    const aux = get("W3pGNRR01012") * 4;
+
+    /* AUX = valeur extraite × 2 */
+    const aux = get("W3pGNRR01012") * 2;
 
     const conso = randa + bvm + smt + aux;
     const prod = g1 + g2;
     const delta = prod - conso;
 
-    document.getElementById("conso").innerText = conso.toFixed(2);
-    document.getElementById("prod").innerText = prod.toFixed(2);
-    document.getElementById("delta").innerText = delta.toFixed(2);
+    /* ✅ ajout unité kW */
+    document.getElementById("conso").innerText = `${conso.toFixed(2)} kW`;
+    document.getElementById("prod").innerText = `${prod.toFixed(2)} kW`;
+    document.getElementById("delta").innerText = `${delta.toFixed(2)} kW`;
 
     let html = "";
 
@@ -195,6 +198,5 @@ async function load() {
   }
 }
 
-/* START SAFE LOOP */
 load();
 setInterval(load, 5000);
