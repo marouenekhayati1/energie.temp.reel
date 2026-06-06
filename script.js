@@ -25,7 +25,7 @@ const NAME = {
 
 let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
 
-/* ===================== CHART ===================== */
+/* ================= CHART ================= */
 const ctx = document.getElementById("chart").getContext("2d");
 
 const chart = new Chart(ctx, {
@@ -74,7 +74,7 @@ history.forEach(h => {
 
 chart.update();
 
-/* ===================== HELPERS ===================== */
+/* ================= HELPERS ================= */
 
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
@@ -94,7 +94,7 @@ function saveHistory(time, conso, prod) {
   localStorage.setItem("watt_history", JSON.stringify(history));
 }
 
-/* ===================== STEG REGIME UPDATED ===================== */
+/* ================= STEG UPDATED ================= */
 function getStegPeriod() {
   const h = new Date().getHours();
   const m = new Date().getMinutes();
@@ -131,7 +131,7 @@ function updateStegUI() {
   }
 }
 
-/* ===================== MAIN LOOP ===================== */
+/* ================= MAIN LOOP ================= */
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -158,7 +158,7 @@ async function load() {
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
 
-    /* ✅ AUX PROPRE (UNE SEULE FOIS ICI) */
+    /* ✅ AUX (CALCUL UNIQUE) */
     const auxRaw = get("W3pGNRR01012");
     const aux = auxRaw * 2;
 
@@ -174,6 +174,11 @@ async function load() {
 
     ORDER.forEach(id => {
       let v = map[id] || 0;
+
+      /* ✅ AFFICHAGE COHÉRENT AUX */
+      if (id === "W3pGNRR01012") {
+        v = v * 2;
+      }
 
       html += `
         <div class="device">
@@ -198,7 +203,6 @@ async function load() {
     }
 
     chart.update();
-
     saveHistory(time, conso, prod);
     updateStegUI();
 
