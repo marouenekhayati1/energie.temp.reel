@@ -125,7 +125,7 @@ function updateStegUI() {
     msg.innerText = "⚠️ Pointe tarifaire – Démarrer les groupes en pleine charge";
     msg.style.color = "#ef4444";
   } else {
-    msg.innerText = "✅ Hors pointe – Suivre la consommation vs production";
+    msg.innerText = "✅ Suivre la consommation vs production";
     msg.style.color = "#22c55e";
   }
 }
