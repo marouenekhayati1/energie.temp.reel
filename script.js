@@ -220,4 +220,4 @@ async function load() {
 }
 
 load();
-setInterval(load, 15000);
+setInterval(load, 10000);
