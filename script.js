@@ -25,7 +25,7 @@ const NAME = {
 
 let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
 
-/* CHART */
+/* ===================== CHART ===================== */
 const ctx = document.getElementById("chart").getContext("2d");
 
 const chart = new Chart(ctx, {
@@ -74,7 +74,8 @@ history.forEach(h => {
 
 chart.update();
 
-/* helpers */
+/* ===================== HELPERS ===================== */
+
 function toKw(v) {
   return v ? parseFloat(v) / 1000 : 0;
 }
@@ -93,16 +94,24 @@ function saveHistory(time, conso, prod) {
   localStorage.setItem("watt_history", JSON.stringify(history));
 }
 
-/* STEG */
+/* ===================== STEG REGIME UPDATED ===================== */
 function getStegPeriod() {
   const h = new Date().getHours();
   const m = new Date().getMinutes();
   const t = h + m / 60;
 
-  if (t >= 22 || t < 6.5) return { name: "Nuit", type: "offpeak" };
-  if (t >= 6.5 && t < 11) return { name: "Matin", type: "normal" };
-  if (t >= 11 && t < 15) return { name: "Pointe matin", type: "peak" };
-  if (t >= 15 && t < 19) return { name: "Après-midi", type: "normal" };
+  if (t >= 22 || t < 6.5)
+    return { name: "Nuit", type: "offpeak" };
+
+  if (t >= 6.5 && t < 8.5)
+    return { name: "Jour", type: "normal" };
+
+  if (t >= 8.5 && t < 13.5)
+    return { name: "Pointe jour", type: "peak" };
+
+  if (t >= 13.5 && t < 19)
+    return { name: "Jour", type: "normal" };
+
   return { name: "Pointe soir", type: "peak" };
 }
 
@@ -114,7 +123,7 @@ function updateStegUI() {
   const msg = document.getElementById("stegMessage");
 
   if (p.type === "peak") {
-    msg.innerText = "⚠️ Pointe tarifaire détectée – Démarrer les groupes en pleine charge";
+    msg.innerText = "⚠️ Pointe tarifaire – Démarrer les groupes en pleine charge";
     msg.style.color = "#ef4444";
   } else {
     msg.innerText = "✅ Hors pointe – Suivre la consommation vs production";
@@ -122,7 +131,7 @@ function updateStegUI() {
   }
 }
 
-/* MAIN LOOP */
+/* ===================== MAIN LOOP ===================== */
 async function load() {
   try {
     const res = await fetch(URL, {
@@ -149,7 +158,7 @@ async function load() {
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
 
-    /* ✅ AUX FIX PROPRE */
+    /* ✅ AUX PROPRE (UNE SEULE FOIS ICI) */
     const auxRaw = get("W3pGNRR01012");
     const aux = auxRaw * 2;
 
@@ -165,11 +174,6 @@ async function load() {
 
     ORDER.forEach(id => {
       let v = map[id] || 0;
-
-      /* ✅ AUX ×2 UNIQUEMENT ICI */
-      if (id === "W3pGNRR01012") {
-        v = v * 2;
-      }
 
       html += `
         <div class="device">
@@ -194,6 +198,7 @@ async function load() {
     }
 
     chart.update();
+
     saveHistory(time, conso, prod);
     updateStegUI();
 
