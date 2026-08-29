@@ -37,6 +37,8 @@ const chart = new Chart(ctx, {
         label: "Consommation",
         data: [],
         borderColor: "#ef4444",
+        backgroundColor: "rgba(239, 68, 68, 0.12)",
+        fill: true,
         borderWidth: 2,
         tension: 0.2,
         pointRadius: 0
@@ -45,9 +47,75 @@ const chart = new Chart(ctx, {
         label: "Production",
         data: [],
         borderColor: "#22c55e",
+        backgroundColor: "rgba(34, 197, 94, 0.12)",
+        fill: true,
         borderWidth: 2,
         tension: 0.2,
         pointRadius: 0
+      },
+      {
+        label: "Delta",
+        data: [],
+        borderColor: "#3b82f6",
+        borderWidth: 2,
+        borderDash: [5, 5],
+        tension: 0.2,
+        pointRadius: 0,
+        hidden: true
+      },
+      {
+        label: "Groupe 1",
+        data: [],
+        borderColor: "#f97316",
+        borderWidth: 2,
+        tension: 0.2,
+        pointRadius: 0,
+        hidden: true
+      },
+      {
+        label: "Groupe 2",
+        data: [],
+        borderColor: "#eab308",
+        borderWidth: 2,
+        tension: 0.2,
+        pointRadius: 0,
+        hidden: true
+      },
+      {
+        label: "Randa",
+        data: [],
+        borderColor: "#a855f7",
+        borderWidth: 2,
+        tension: 0.2,
+        pointRadius: 0,
+        hidden: true
+      },
+      {
+        label: "BVM",
+        data: [],
+        borderColor: "#ec4899",
+        borderWidth: 2,
+        tension: 0.2,
+        pointRadius: 0,
+        hidden: true
+      },
+      {
+        label: "SMT",
+        data: [],
+        borderColor: "#14b8a6",
+        borderWidth: 2,
+        tension: 0.2,
+        pointRadius: 0,
+        hidden: true
+      },
+      {
+        label: "Auxiliaire",
+        data: [],
+        borderColor: "#64748b",
+        borderWidth: 2,
+        tension: 0.2,
+        pointRadius: 0,
+        hidden: true
       }
     ]
   },
@@ -55,10 +123,16 @@ const chart = new Chart(ctx, {
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
+    interaction: {
+      mode: "index",
+      intersect: false
+    },
     plugins: {
       legend: {
         labels: {
-          color: "white"
+          color: "white",
+          usePointStyle: true,
+          pointStyle: "line"
         }
       }
     },
@@ -192,14 +266,20 @@ async function loadChartData() {
 function displayChart(rows) {
   // Vider le graphique
   chart.data.labels = [];
-  chart.data.datasets[0].data = [];
-  chart.data.datasets[1].data = [];
+  chart.data.datasets.forEach(ds => ds.data = []);
 
   // L'axe X affiche l'HEURE SEULEMENT (pas la date)
   rows.forEach(h => {
     chart.data.labels.push(String(h.time).substring(0, 8));
     chart.data.datasets[0].data.push(h.conso);
     chart.data.datasets[1].data.push(h.prod);
+    chart.data.datasets[2].data.push(h.conso - h.prod);
+    chart.data.datasets[3].data.push(h.g1    || 0);
+    chart.data.datasets[4].data.push(h.g2    || 0);
+    chart.data.datasets[5].data.push(h.randa || 0);
+    chart.data.datasets[6].data.push(h.bvm   || 0);
+    chart.data.datasets[7].data.push(h.smt   || 0);
+    chart.data.datasets[8].data.push(h.aux   || 0);
   });
 
   chart.update();
