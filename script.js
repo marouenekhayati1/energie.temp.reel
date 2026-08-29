@@ -229,37 +229,37 @@ function fillHours() {
 }
 
 // ===== Charger le graphique selon jour + période (depuis Google Sheet) =====
-async function loadChartData() {
-  const daySelect = document.getElementById("daySelect").value;
-
-  let day;
-  if (daySelect === "today") {
-    day = todayStr();
-  } else if (daySelect === "yesterday") {
-    day = yesterdayStr();
-  } else {
-    day = daySelect;
-  }
-
-  const start = document.getElementById("startHour").value;
-  const end = document.getElementById("endHour").value;
-
-  const url = SHEET_URL +
-    "?action=read" +
-    "&date=" + encodeURIComponent(day) +
-    "&start=" + encodeURIComponent(start) +
-    "&end=" + encodeURIComponent(end);
+// ===== Remplir le sélecteur de jour depuis le Sheet =====
+async function loadDays() {
+  const select = document.getElementById("daySelect");
+  const selected = select.value; // garder la sélection actuelle
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(SHEET_URL + "?action=days");
     const json = await res.json();
 
-    if (!json.ok) throw new Error("read failed");
+    if (!json.ok) return;
 
-    displayChart(json.data);
+    // Supprimer les anciennes options de dates (garder "today")
+    while (select.options.length > 1) {
+      select.remove(1);
+    }
+
+    // Ajouter les dates trouvées dans le Sheet
+    json.days.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      select.appendChild(opt);
+    });
+
+    // Restaurer la sélection si elle existe encore
+    if (selected) {
+      select.value = selected;
+    }
 
   } catch (err) {
-    console.error("Erreur lecture Sheet :", err);
+    console.error("Erreur lecture jours :", err);
   }
 }
 
@@ -503,3 +503,5 @@ setInterval(() => {
     loadChartData();
   }
 }, 10000);
+// Recharger la liste des dates toutes les heures
+setInterval(loadDays, 3600000);
