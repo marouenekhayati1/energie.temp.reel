@@ -65,7 +65,8 @@ const chart = new Chart(ctx, {
     scales: {
       x: {
         ticks: {
-          color: "white"
+          color: "white",
+          maxTicksLimit: 15
         }
       },
       y: {
@@ -152,7 +153,7 @@ function fillHours() {
   end.value = "23";
 }
 
-// ===== Charger le graphique selon jour + période =====
+// ===== Charger le graphique selon jour + période (depuis Google Sheet) =====
 async function loadChartData() {
   const daySelect = document.getElementById("daySelect").value;
 
@@ -194,8 +195,9 @@ function displayChart(rows) {
   chart.data.datasets[0].data = [];
   chart.data.datasets[1].data = [];
 
+  // L'axe X affiche l'HEURE SEULEMENT (pas la date)
   rows.forEach(h => {
-    chart.data.labels.push(h.time);
+    chart.data.labels.push(String(h.time).substring(0, 8));
     chart.data.datasets[0].data.push(h.conso);
     chart.data.datasets[1].data.push(h.prod);
   });
@@ -229,11 +231,6 @@ function displayChart(rows) {
   document.getElementById("tProdMoy").innerText = prodMoy.toFixed(2) + " kW";
   document.getElementById("tProdMax").innerText = prodMax.toFixed(2) + " kW";
   document.getElementById("tEnergie").innerText = energie.toFixed(1) + " kWh";
-}
-
-// ===== Bouton Afficher =====
-function applyPeriod() {
-  loadChartData();
 }
 
 // ===== Sauvegarde vers le Sheet =====
@@ -296,7 +293,7 @@ function updateStegUI() {
   }
 }
 
-// ===== Temps réel =====
+// ===== Temps réel (cartes + sections + sauvegarde Sheet) =====
 async function load() {
 
   try {
@@ -381,28 +378,6 @@ async function load() {
 
     document.getElementById("devices").innerHTML = html;
 
-    // Si le jour sélectionné = aujourd'hui, on ajoute le point en direct
-    const daySelect = document.getElementById("daySelect").value;
-    if (daySelect === "today") {
-      const time = getTime();
-      const start = document.getElementById("startHour").value;
-      const end = document.getElementById("endHour").value;
-      const h = new Date().getHours();
-
-      if (Number(h) >= Number(start) && Number(h) <= Number(end)) {
-        chart.data.labels.push(time);
-        chart.data.datasets[0].data.push(conso);
-        chart.data.datasets[1].data.push(prod);
-
-        if (chart.data.labels.length > 40) {
-          chart.data.labels.shift();
-          chart.data.datasets[0].data.shift();
-          chart.data.datasets[1].data.shift();
-        }
-        chart.update();
-      }
-    }
-
     saveHistory(getTime(), conso, prod, delta);
 
     updateStegUI();
@@ -423,4 +398,14 @@ fillHours();
 loadDays();
 loadChartData();
 load();
+
+// Cartes temps réel toutes les 10s
 setInterval(load, 10000);
+
+// LIVE : recharger le graphique depuis Google Sheet toutes les 10s
+// (uniquement si "Temps réel (Live)" est sélectionné)
+setInterval(() => {
+  if (document.getElementById("daySelect").value === "today") {
+    loadChartData();
+  }
+}, 10000);
