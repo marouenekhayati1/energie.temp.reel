@@ -498,10 +498,10 @@ setInterval(load, 10000);
 
 // LIVE : recharger le graphique depuis Google Sheet toutes les 10s
 // (uniquement si "Temps réel (Live)" est sélectionné)
-setInterval(() => {
+/*setInterval(() => {
   if (document.getElementById("daySelect").value === "today") {
     loadChartData();
   }
-}, 10000);
+}, 10000);*/
 // Recharger la liste des dates toutes les heures
 setInterval(loadDays, 3600000);
