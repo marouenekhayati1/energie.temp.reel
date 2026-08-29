@@ -4,7 +4,7 @@ const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
-// ===== Google Sheet Web App ===== 29/08/2026 enregistrement dans google sheet
+// ===== Google Sheet Web App =====
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbzDWUmwWv9xShVggdGa5HRVrjZ-vh32oCDIr-qDP_V9YXhEu0yqliaWX7SqR1VZv0oAOw/exec";
 
 const ORDER = [
@@ -25,8 +25,7 @@ const NAME = {
   W3pGNRR01012: "Auxiliaire"
 };
 
-let history = JSON.parse(localStorage.getItem("watt_history") || "[]");
-
+// ===== Chart =====
 const ctx = document.getElementById("chart").getContext("2d");
 
 const chart = new Chart(ctx, {
@@ -78,40 +77,22 @@ const chart = new Chart(ctx, {
   }
 });
 
-// ===== Charger l'historique depuis Google Sheet =====
-async function loadHistoryFromSheet() {
-  try {
-    const res = await fetch(SHEET_URL + "?action=read");
-    const json = await res.json();
+// ===== Helpers date / heure =====
 
-    if (!json.ok) throw new Error("read failed");
-
-    const rows = json.data.slice(-50);
-
-    rows.forEach(h => {
-      chart.data.labels.push(h.time);
-      chart.data.datasets[0].data.push(h.conso);
-      chart.data.datasets[1].data.push(h.prod);
-    });
-
-    chart.update();
-
-  } catch (err) {
-    console.error("Erreur lecture Sheet :", err);
-
-    history.forEach(h => {
-      chart.data.labels.push(h.time);
-      chart.data.datasets[0].data.push(h.conso);
-      chart.data.datasets[1].data.push(h.prod);
-    });
-    chart.update();
-  }
+// Date du jour au format yyyy-mm-dd
+function todayStr() {
+  const n = new Date();
+  return n.getFullYear() + "-" +
+    String(n.getMonth() + 1).padStart(2, "0") + "-" +
+    String(n.getDate()).padStart(2, "0");
 }
 
-loadHistoryFromSheet();
-
-function toKw(v) {
-  return Number(v || 0) / 1000;
+function yesterdayStr() {
+  const n = new Date();
+  n.setDate(n.getDate() - 1);
+  return n.getFullYear() + "-" +
+    String(n.getMonth() + 1).padStart(2, "0") + "-" +
+    String(n.getDate()).padStart(2, "0");
 }
 
 function getTime() {
@@ -122,22 +103,160 @@ function getTime() {
   });
 }
 
-function saveHistory(time, conso, prod, delta) {
-  history.push({ time, conso, prod });
-  if (history.length > 50) history.shift();
-  localStorage.setItem("watt_history", JSON.stringify(history));
+function toKw(v) {
+  return Number(v || 0) / 1000;
+}
 
+// ===== Remplir le sélecteur de jour depuis le Sheet =====
+async function loadDays() {
+  const select = document.getElementById("daySelect");
+
+  try {
+    const res = await fetch(SHEET_URL + "?action=days");
+    const json = await res.json();
+
+    if (!json.ok) return;
+
+    json.days.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      select.appendChild(opt);
+    });
+
+  } catch (err) {
+    console.error("Erreur lecture jours :", err);
+  }
+}
+
+// ===== Remplir les sélecteurs d'heures =====
+function fillHours() {
+  const start = document.getElementById("startHour");
+  const end = document.getElementById("endHour");
+
+  for (let h = 0; h <= 23; h++) {
+    const hh = String(h).padStart(2, "0");
+
+    const o1 = document.createElement("option");
+    o1.value = hh;
+    o1.textContent = hh + ":00";
+    start.appendChild(o1);
+
+    const o2 = document.createElement("option");
+    o2.value = hh;
+    o2.textContent = hh + ":59";
+    end.appendChild(o2);
+  }
+
+  start.value = "00";
+  end.value = "23";
+}
+
+// ===== Charger le graphique selon jour + période =====
+async function loadChartData() {
+  const daySelect = document.getElementById("daySelect").value;
+
+  let day;
+  if (daySelect === "today") {
+    day = todayStr();
+  } else if (daySelect === "yesterday") {
+    day = yesterdayStr();
+  } else {
+    day = daySelect;
+  }
+
+  const start = document.getElementById("startHour").value;
+  const end = document.getElementById("endHour").value;
+
+  const url = SHEET_URL +
+    "?action=read" +
+    "&date=" + encodeURIComponent(day) +
+    "&start=" + encodeURIComponent(start) +
+    "&end=" + encodeURIComponent(end);
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if (!json.ok) throw new Error("read failed");
+
+    displayChart(json.data);
+
+  } catch (err) {
+    console.error("Erreur lecture Sheet :", err);
+  }
+}
+
+// ===== Afficher les données + tendance =====
+function displayChart(rows) {
+  // Vider le graphique
+  chart.data.labels = [];
+  chart.data.datasets[0].data = [];
+  chart.data.datasets[1].data = [];
+
+  rows.forEach(h => {
+    chart.data.labels.push(h.time);
+    chart.data.datasets[0].data.push(h.conso);
+    chart.data.datasets[1].data.push(h.prod);
+  });
+
+  chart.update();
+
+  // ===== Tendances =====
+  if (rows.length === 0) {
+    document.getElementById("tConsoMoy").innerText = "---";
+    document.getElementById("tConsoMax").innerText = "---";
+    document.getElementById("tProdMoy").innerText = "---";
+    document.getElementById("tProdMax").innerText = "---";
+    document.getElementById("tEnergie").innerText = "---";
+    return;
+  }
+
+  const consoVals = rows.map(r => r.conso);
+  const prodVals = rows.map(r => r.prod);
+
+  const consoMoy = consoVals.reduce((a, b) => a + b, 0) / consoVals.length;
+  const prodMoy = prodVals.reduce((a, b) => a + b, 0) / prodVals.length;
+  const consoMax = Math.max(...consoVals);
+  const prodMax = Math.max(...prodVals);
+
+  // Énergie ≈ moyenne kW × durée de la période (heures)
+  const durationHours = rows.length * (10 / 3600); // point toutes les 10s
+  const energie = consoMoy * durationHours;
+
+  document.getElementById("tConsoMoy").innerText = consoMoy.toFixed(2) + " kW";
+  document.getElementById("tConsoMax").innerText = consoMax.toFixed(2) + " kW";
+  document.getElementById("tProdMoy").innerText = prodMoy.toFixed(2) + " kW";
+  document.getElementById("tProdMax").innerText = prodMax.toFixed(2) + " kW";
+  document.getElementById("tEnergie").innerText = energie.toFixed(1) + " kWh";
+}
+
+// ===== Bouton Afficher =====
+function applyPeriod() {
+  loadChartData();
+}
+
+// ===== Sauvegarde vers le Sheet =====
+function saveHistory(time, conso, prod, delta) {
   fetch(SHEET_URL, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify({ time, conso, prod, delta })
+    body: JSON.stringify({
+      date: todayStr(),
+      time: time,
+      conso: conso,
+      prod: prod,
+      delta: delta
+    })
   }).catch(err => console.error("Erreur Sheet :", err));
 }
 
+// ===== Régime STEG =====
 function getStegPeriod() {
   const now = new Date();
 
+  // Dimanche : tarif nuit toute la journée
   if (now.getDay() === 0) {
     return { name: "Nuit (Dimanche)", type: "offpeak" };
   }
@@ -177,6 +296,7 @@ function updateStegUI() {
   }
 }
 
+// ===== Temps réel =====
 async function load() {
 
   try {
@@ -261,21 +381,29 @@ async function load() {
 
     document.getElementById("devices").innerHTML = html;
 
-    const time = getTime();
+    // Si le jour sélectionné = aujourd'hui, on ajoute le point en direct
+    const daySelect = document.getElementById("daySelect").value;
+    if (daySelect === "today") {
+      const time = getTime();
+      const start = document.getElementById("startHour").value;
+      const end = document.getElementById("endHour").value;
+      const h = new Date().getHours();
 
-    chart.data.labels.push(time);
-    chart.data.datasets[0].data.push(conso);
-    chart.data.datasets[1].data.push(prod);
+      if (Number(h) >= Number(start) && Number(h) <= Number(end)) {
+        chart.data.labels.push(time);
+        chart.data.datasets[0].data.push(conso);
+        chart.data.datasets[1].data.push(prod);
 
-    if (chart.data.labels.length > 40) {
-      chart.data.labels.shift();
-      chart.data.datasets[0].data.shift();
-      chart.data.datasets[1].data.shift();
+        if (chart.data.labels.length > 40) {
+          chart.data.labels.shift();
+          chart.data.datasets[0].data.shift();
+          chart.data.datasets[1].data.shift();
+        }
+        chart.update();
+      }
     }
 
-    chart.update();
-
-    saveHistory(time, conso, prod, delta);
+    saveHistory(getTime(), conso, prod, delta);
 
     updateStegUI();
 
@@ -290,6 +418,9 @@ async function load() {
   }
 }
 
+// ===== Initialisation =====
+fillHours();
+loadDays();
+loadChartData();
 load();
-
 setInterval(load, 10000);
