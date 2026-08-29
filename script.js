@@ -107,6 +107,12 @@ function saveHistory(time, conso, prod) {
 
 function getStegPeriod() {
   const now = new Date();
+
+  // Dimanche : tarif nuit toute la journée
+  if (now.getDay() === 0) {
+    return { name: "Nuit (Dimanche)", type: "offpeak" };
+  }
+
   const t = now.getHours() + now.getMinutes() / 60;
 
   if (t >= 22 || t < 6.5)
