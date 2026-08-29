@@ -1,0 +1,133 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+h1 { margin-bottom: 15px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.value {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.conso { color: #ef4444; }
+.prod { color: #22c55e; }
+.delta { color: #facc15; }
+
+.message-card {
+  margin-top: 10px;
+}
+
+#stegMessage {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.devices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.device {
+  background: #1e293b;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.chart-container {
+  margin-top: 20px;
+  background: #0b1220;
+  border-radius: 12px;
+  padding: 12px;
+  height: 300px;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ===== Sélecteur de période ===== */
+.controls {
+  margin-top: 20px;
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.controls label {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.controls select,
+.controls input {
+  background: #0b1220;
+  color: white;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.controls button {
+  background: #22c55e;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: #16a34a;
+}
+
+/* ===== Tendances ===== */
+.trends {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.trend {
+  background: #1e293b;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.trend .t-value {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 4px;
+}
