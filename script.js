@@ -5,7 +5,7 @@ const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
 // ===== Google Sheet Web App =====
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbz21t2U4oVabVq3dzRlc9ERS5Ogf5Bxjxqj6Yi2h5CnLP8XNHY1X93gfw2v83BOTxIbFA/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxPUko15_794wiFlQ9f2hctuvsid5lYkq00tU9M3slSdfBK9rkG3Gn11yGWtwbVJB0JuA/exec";
 
 const ORDER = [
   "W3pGNRR01016",
@@ -233,8 +233,8 @@ function displayChart(rows) {
   document.getElementById("tEnergie").innerText = energie.toFixed(1) + " kWh";
 }
 
-// ===== Sauvegarde vers le Sheet =====
-function saveHistory(time, conso, prod, delta) {
+// ===== Sauvegarde vers le Sheet (avec les appareils) =====
+function saveHistory(time, conso, prod, delta, devices) {
   fetch(SHEET_URL, {
     method: "POST",
     mode: "no-cors",
@@ -244,7 +244,13 @@ function saveHistory(time, conso, prod, delta) {
       time: time,
       conso: conso,
       prod: prod,
-      delta: delta
+      delta: delta,
+      g1: devices.g1,
+      g2: devices.g2,
+      randa: devices.randa,
+      bvm: devices.bvm,
+      smt: devices.smt,
+      aux: devices.aux
     })
   }).catch(err => console.error("Erreur Sheet :", err));
 }
@@ -378,7 +384,14 @@ async function load() {
 
     document.getElementById("devices").innerHTML = html;
 
-    saveHistory(getTime(), conso, prod, delta);
+    saveHistory(getTime(), conso, prod, delta, {
+      g1: g1,
+      g2: g2,
+      randa: randa,
+      bvm: bvm,
+      smt: smt,
+      aux: aux
+    });
 
     updateStegUI();
 
