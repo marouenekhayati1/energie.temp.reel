@@ -45,18 +45,19 @@
 <div class="devices" id="devices"></div>
 
 <!-- ===== Sélecteur de jour et période ===== -->
+<!-- ===== Sélecteur de jour et période ===== -->
 <div class="controls">
   <label>📅 Jour :</label>
-  <select id="daySelect">
-    <option value="today">Aujourd'hui</option>
+  <select id="daySelect" onchange="loadChartData()">
+    <option value="today">🔴 Temps réel (Live)</option>
     <option value="yesterday">Hier</option>
   </select>
 
   <label>De :</label>
-  <select id="startHour"></select>
+  <select id="startHour" onchange="loadChartData()"></select>
 
   <label>À :</label>
-  <select id="endHour"></select>
+  <select id="endHour" onchange="loadChartData()"></select>
 </div>
 
 <!-- ===== Tendances ===== -->
