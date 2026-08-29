@@ -2,7 +2,7 @@ const USER_ID = "us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc";
 const TOKEN = "eyJraWQiOiJ0Z0NRSUg5U3hlZW9jcWdLWjV0aXFpbVZzOFlMV1hLTnJhOWMzcUNZVEU4PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhM2U3NzNhZS1hYWE4LTRmMzMtYmRiZS1hOWFhMzA5MzlmYWEiLCJkZXZpY2Vfa2V5IjoidXMtZWFzdC0xX2NkNTkyYWRjLTFiMTQtNGY5ZS1hOTFjLTc2ZGViN2M5ZmUyNCIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xX05JcWFJV040cCIsImNsaWVudF9pZCI6IjQ4czNycGltMTg0N2x2bmZkOHBjZTlnbHFoIiwiZXZlbnRfaWQiOiI0ZGY1MTYyMy1lZmIyLTQ0YTMtYjNjNC0yYjNjZWY4YzVmMzgiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNzg0NDg3MTM5LCJleHAiOjE3ODQ1NzM1NDIsImlhdCI6MTc4NDQ4NzE0MiwianRpIjoiYjFhN2Y1ODgtYjAxNy00N2E1LWIzNzItOWQzODhmZGFjM2MyIiwidXNlcm5hbWUiOiJyYW5kYV9hZG1pbiJ9.RuMmzICPjMXagtmE_wJXHFpb-Acd2hASJjzgEHzoigvkhdmA9P1q8BfvRe3cydAyaAjJ8kr6OGT4lDuQg5UQEVY0klzchMWB0vkHKy0uOn5HQkjz6S4yCRg0OW2yT4fcMxKh5zS_aCOwm0k_t46QwMsy9C-BbEEirOghwPEFrf04pqCEl5xvLvBqC-I13dodBIlJZeWJEdUy2ehqBWjEYJZkfwOg4qebY7I26RYOK9II7-2doBwdbzysBML9xkf7G0INqG75YlsgKplIgtHiuGbktXWaRc3Ja2SsUkIzZqBwbRpSHBj31iaorkufZTJeNBLlndCk0AXG07vk0dqK-A";
 const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
-const URL = `https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/${USER_ID}/${USER_ID}/tri`;
+const URL = `https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/USERID/{USER_ID}/USERI​D/{USER_ID}/tri`;
 
 const ORDER = [
   "W3pGNRR01016",
@@ -107,6 +107,12 @@ function saveHistory(time, conso, prod) {
 
 function getStegPeriod() {
   const now = new Date();
+
+  // Dimanche : tarif nuit toute la journée
+  if (now.getDay() === 0) {
+    return { name: "Nuit (Dimanche)", type: "offpeak" };
+  }
+
   const t = now.getHours() + now.getMinutes() / 60;
 
   if (t >= 22 || t < 6.5)
@@ -226,7 +232,7 @@ async function load() {
 
     document.getElementById("devices").innerHTML = html;
 
-      const time = getTime();
+    const time = getTime();
 
     chart.data.labels.push(time);
     chart.data.datasets[0].data.push(conso);
