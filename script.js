@@ -4,7 +4,7 @@ const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
-// ===== Google Sheet Web App =====
+// ===== Google Sheet Web App ===== 29/08/2026 enregistrement dans google sheet
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbzDWUmwWv9xShVggdGa5HRVrjZ-vh32oCDIr-qDP_V9YXhEu0yqliaWX7SqR1VZv0oAOw/exec";
 
 const ORDER = [
