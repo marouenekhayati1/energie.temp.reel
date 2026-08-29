@@ -506,4 +506,4 @@ setInterval(() => {
 }, 10000);
 
 // Recharger la liste des dates toutes les heures
-setInterval(loadDays, 3600000);
+//setInterval(loadDays, 3600000);
