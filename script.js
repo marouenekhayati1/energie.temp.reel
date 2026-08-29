@@ -2,11 +2,10 @@ const USER_ID = "us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc";
 const TOKEN = "eyJraWQiOiJ0Z0NRSUg5U3hlZW9jcWdLWjV0aXFpbVZzOFlMV1hLTnJhOWMzcUNZVEU4PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhM2U3NzNhZS1hYWE4LTRmMzMtYmRiZS1hOWFhMzA5MzlmYWEiLCJkZXZpY2Vfa2V5IjoidXMtZWFzdC0xX2NkNTkyYWRjLTFiMTQtNGY5ZS1hOTFjLTc2ZGViN2M5ZmUyNCIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xX05JcWFJV040cCIsImNsaWVudF9pZCI6IjQ4czNycGltMTg0N2x2bmZkOHBjZTlnbHFoIiwiZXZlbnRfaWQiOiI0ZGY1MTYyMy1lZmIyLTQ0YTMtYjNjNC0yYjNjZWY4YzVmMzgiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNzg0NDg3MTM5LCJleHAiOjE3ODQ1NzM1NDIsImlhdCI6MTc4NDQ4NzE0MiwianRpIjoiYjFhN2Y1ODgtYjAxNy00N2E1LWIzNzItOWQzODhmZGFjM2MyIiwidXNlcm5hbWUiOiJyYW5kYV9hZG1pbiJ9.RuMmzICPjMXagtmE_wJXHFpb-Acd2hASJjzgEHzoigvkhdmA9P1q8BfvRe3cydAyaAjJ8kr6OGT4lDuQg5UQEVY0klzchMWB0vkHKy0uOn5HQkjz6S4yCRg0OW2yT4fcMxKh5zS_aCOwm0k_t46QwMsy9C-BbEEirOghwPEFrf04pqCEl5xvLvBqC-I13dodBIlJZeWJEdUy2ehqBWjEYJZkfwOg4qebY7I26RYOK9II7-2doBwdbzysBML9xkf7G0INqG75YlsgKplIgtHiuGbktXWaRc3Ja2SsUkIzZqBwbRpSHBj31iaorkufZTJeNBLlndCk0AXG07vk0dqK-A";
 const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
-const URL = `https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/USERID/{USER_ID}/USERI​D/{USER_ID}/tri`;
+const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
 // ===== Google Sheet Web App =====
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbzDWUmwWv9xShVggdGa5HRVrjZ-vh32oCDIr-qDP_V9YXhEu0yqliaWX7SqR1VZv0oAOw/exec";
-
 
 const ORDER = [
   "W3pGNRR01016",
@@ -87,7 +86,7 @@ async function loadHistoryFromSheet() {
 
     if (!json.ok) throw new Error("read failed");
 
-    const rows = json.data.slice(-50); // dernier 50 points
+    const rows = json.data.slice(-50);
 
     rows.forEach(h => {
       chart.data.labels.push(h.time);
@@ -100,7 +99,6 @@ async function loadHistoryFromSheet() {
   } catch (err) {
     console.error("Erreur lecture Sheet :", err);
 
-    // Fallback : historique local
     history.forEach(h => {
       chart.data.labels.push(h.time);
       chart.data.datasets[0].data.push(h.conso);
@@ -125,12 +123,10 @@ function getTime() {
 }
 
 function saveHistory(time, conso, prod, delta) {
-  // Historique local (fallback)
   history.push({ time, conso, prod });
   if (history.length > 50) history.shift();
   localStorage.setItem("watt_history", JSON.stringify(history));
 
-  // Sauvegarde dans Google Sheet
   fetch(SHEET_URL, {
     method: "POST",
     mode: "no-cors",
@@ -142,7 +138,6 @@ function saveHistory(time, conso, prod, delta) {
 function getStegPeriod() {
   const now = new Date();
 
-  // Dimanche : tarif nuit toute la journée
   if (now.getDay() === 0) {
     return { name: "Nuit (Dimanche)", type: "offpeak" };
   }
