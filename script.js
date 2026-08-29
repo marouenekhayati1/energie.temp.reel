@@ -7,7 +7,6 @@ const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wa
 // ===== Google Sheet Web App =====
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxJaBXBbJug7i2ijsFYqhdKLp5ZWfQv4PWy-qKNhompWUYwtoJ_R7CZydplCIrC2j7M/exec";
 
-
 const ORDER = [
   "W3pGNRR01016",
   "W3pGNRR01017",
@@ -163,14 +162,6 @@ function todayStr() {
     String(n.getDate()).padStart(2, "0");
 }
 
-function yesterdayStr() {
-  const n = new Date();
-  n.setDate(n.getDate() - 1);
-  return n.getFullYear() + "-" +
-    String(n.getMonth() + 1).padStart(2, "0") + "-" +
-    String(n.getDate()).padStart(2, "0");
-}
-
 function getTime() {
   return new Date().toLocaleTimeString("fr-FR", {
     hour: "2-digit",
@@ -183,52 +174,6 @@ function toKw(v) {
   return Number(v || 0) / 1000;
 }
 
-// ===== Remplir le sélecteur de jour depuis le Sheet =====
-async function loadDays() {
-  const select = document.getElementById("daySelect");
-
-  try {
-    const res = await fetch(SHEET_URL + "?action=days");
-    const json = await res.json();
-
-    if (!json.ok) return;
-
-    json.days.forEach(d => {
-      const opt = document.createElement("option");
-      opt.value = d;
-      opt.textContent = d;
-      select.appendChild(opt);
-    });
-
-  } catch (err) {
-    console.error("Erreur lecture jours :", err);
-  }
-}
-
-// ===== Remplir les sélecteurs d'heures =====
-function fillHours() {
-  const start = document.getElementById("startHour");
-  const end = document.getElementById("endHour");
-
-  for (let h = 0; h <= 23; h++) {
-    const hh = String(h).padStart(2, "0");
-
-    const o1 = document.createElement("option");
-    o1.value = hh;
-    o1.textContent = hh + ":00";
-    start.appendChild(o1);
-
-    const o2 = document.createElement("option");
-    o2.value = hh;
-    o2.textContent = hh + ":59";
-    end.appendChild(o2);
-  }
-
-  start.value = "00";
-  end.value = "23";
-}
-
-// ===== Charger le graphique selon jour + période (depuis Google Sheet) =====
 // ===== Remplir le sélecteur de jour depuis le Sheet =====
 async function loadDays() {
   const select = document.getElementById("daySelect");
@@ -260,6 +205,62 @@ async function loadDays() {
 
   } catch (err) {
     console.error("Erreur lecture jours :", err);
+  }
+}
+
+// ===== Remplir les sélecteurs d'heures =====
+function fillHours() {
+  const start = document.getElementById("startHour");
+  const end = document.getElementById("endHour");
+
+  for (let h = 0; h <= 23; h++) {
+    const hh = String(h).padStart(2, "0");
+
+    const o1 = document.createElement("option");
+    o1.value = hh;
+    o1.textContent = hh + ":00";
+    start.appendChild(o1);
+
+    const o2 = document.createElement("option");
+    o2.value = hh;
+    o2.textContent = hh + ":59";
+    end.appendChild(o2);
+  }
+
+  start.value = "00";
+  end.value = "23";
+}
+
+// ===== Charger le graphique selon jour + période (depuis Google Sheet) =====
+async function loadChartData() {
+  const daySelect = document.getElementById("daySelect").value;
+
+  let day;
+  if (daySelect === "today") {
+    day = todayStr();
+  } else {
+    day = daySelect;
+  }
+
+  const start = document.getElementById("startHour").value;
+  const end = document.getElementById("endHour").value;
+
+  const url = SHEET_URL +
+    "?action=read" +
+    "&date=" + encodeURIComponent(day) +
+    "&start=" + encodeURIComponent(start) +
+    "&end=" + encodeURIComponent(end);
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if (!json.ok) throw new Error("read failed");
+
+    displayChart(json.data);
+
+  } catch (err) {
+    console.error("Erreur lecture Sheet :", err);
   }
 }
 
@@ -503,5 +504,6 @@ setInterval(() => {
     loadChartData();
   }
 }, 10000);
+
 // Recharger la liste des dates toutes les heures
 setInterval(loadDays, 3600000);
