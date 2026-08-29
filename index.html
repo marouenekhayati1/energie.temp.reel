@@ -73,6 +73,70 @@ canvas {
   font-size: 14px;
   margin-top: 5px;
 }
+
+/* ===== Sélecteur de période ===== */
+.controls {
+  margin-top: 20px;
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.controls label {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.controls select,
+.controls input {
+  background: #0b1220;
+  color: white;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.controls button {
+  background: #22c55e;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: #16a34a;
+}
+
+/* ===== Tendances ===== */
+.trends {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.trend {
+  background: #1e293b;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.trend .t-value {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 4px;
+}
 </style>
 </head>
 
@@ -110,6 +174,48 @@ canvas {
 
 <h3>Sections</h3>
 <div class="devices" id="devices"></div>
+
+<!-- ===== Sélecteur de jour et période ===== -->
+<div class="controls">
+  <label>📅 Jour :</label>
+  <select id="daySelect">
+    <option value="today">Aujourd'hui</option>
+    <option value="yesterday">Hier</option>
+  </select>
+
+  <label>De :</label>
+  <select id="startHour"></select>
+
+  <label>À :</label>
+  <select id="endHour"></select>
+
+  <button onclick="applyPeriod()">Afficher</button>
+</div>
+
+<!-- ===== Tendances ===== -->
+<h3>📈 Tendance de la période</h3>
+<div class="trends">
+  <div class="trend">
+    <div>Conso moyenne</div>
+    <div id="tConsoMoy" class="t-value">---</div>
+  </div>
+  <div class="trend">
+    <div>Conso max</div>
+    <div id="tConsoMax" class="t-value">---</div>
+  </div>
+  <div class="trend">
+    <div>Prod moyenne</div>
+    <div id="tProdMoy" class="t-value">---</div>
+  </div>
+  <div class="trend">
+    <div>Prod max</div>
+    <div id="tProdMax" class="t-value">---</div>
+  </div>
+  <div class="trend">
+    <div>Énergie conso (kWh)</div>
+    <div id="tEnergie" class="t-value">---</div>
+  </div>
+</div>
 
 <div class="chart-container">
   <canvas id="chart"></canvas>
