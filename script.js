@@ -287,7 +287,6 @@ function displayChart(rows) {
   chart.update();
 
   // ===== Tendances =====
-    // ===== Tendances =====
   if (rows.length === 0) {
     document.getElementById("tConsoMoy").innerText = "---";
     document.getElementById("tConsoMax").innerText = "---";
@@ -327,7 +326,7 @@ function displayChart(rows) {
     // Ignorer les trous (dashboard fermé, coupure, changement de période...)
     if (dt <= 0 || dt > MAX_GAP_SEC) continue;
 
-    // durée en heures × puissance moyenne entre les 2 points
+    // durée en heures × puissance moyenne entre les 2 points (méthode des trapèzes)
     const hours = dt / 3600;
     energie      += hours * (rows[i].conso + rows[i - 1].conso) / 2;
     energieProd  += hours * (rows[i].prod  + rows[i - 1].prod)  / 2;
@@ -339,7 +338,7 @@ function displayChart(rows) {
   document.getElementById("tProdMax").innerText = prodMax.toFixed(2) + " kW";
   document.getElementById("tEnergie").innerText = energie.toFixed(1) + " kWh";
   document.getElementById("tEnergieProd").innerText = energieProd.toFixed(1) + " kWh";
-
+}   // ← fin de displayChart() ✅
 
 // ===== Sauvegarde vers le Sheet (avec les appareils) =====
 function saveHistory(time, conso, prod, delta, devices) {
