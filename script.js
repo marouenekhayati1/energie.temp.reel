@@ -287,12 +287,14 @@ function displayChart(rows) {
   chart.update();
 
   // ===== Tendances =====
+    // ===== Tendances =====
   if (rows.length === 0) {
     document.getElementById("tConsoMoy").innerText = "---";
     document.getElementById("tConsoMax").innerText = "---";
     document.getElementById("tProdMoy").innerText = "---";
     document.getElementById("tProdMax").innerText = "---";
     document.getElementById("tEnergie").innerText = "---";
+    document.getElementById("tEnergieProd").innerText = "---";
     return;
   }
 
@@ -304,16 +306,40 @@ function displayChart(rows) {
   const consoMax = Math.max(...consoVals);
   const prodMax = Math.max(...prodVals);
 
-  // Énergie ≈ moyenne kW × durée de la période (heures)
-  const durationHours = rows.length * (10 / 3600); // point toutes les 10s
-  const energie = consoMoy * durationHours;
+  // ===== Énergie précise : écarts d'horaires réels =====
+
+  // Convertit "HH:mm:ss" en secondes depuis minuit
+  function timeToSec(t) {
+    const p = String(t).substring(0, 8).split(":");
+    return (Number(p[0]) * 3600) + (Number(p[1]) * 60) + Number(p[2]);
+  }
+
+  // Durée max entre 2 points avant de considérer une coupure
+  // (au-delà, on ne compte pas l'énergie — évite de compter les nuits/pannes)
+  const MAX_GAP_SEC = 300; // 5 minutes
+
+  let energie = 0;       // kWh consommés
+  let energieProd = 0;   // kWh produits
+
+  for (let i = 1; i < rows.length; i++) {
+    const dt = timeToSec(rows[i].time) - timeToSec(rows[i - 1].time);
+
+    // Ignorer les trous (dashboard fermé, coupure, changement de période...)
+    if (dt <= 0 || dt > MAX_GAP_SEC) continue;
+
+    // durée en heures × puissance moyenne entre les 2 points
+    const hours = dt / 3600;
+    energie      += hours * (rows[i].conso + rows[i - 1].conso) / 2;
+    energieProd  += hours * (rows[i].prod  + rows[i - 1].prod)  / 2;
+  }
 
   document.getElementById("tConsoMoy").innerText = consoMoy.toFixed(2) + " kW";
   document.getElementById("tConsoMax").innerText = consoMax.toFixed(2) + " kW";
   document.getElementById("tProdMoy").innerText = prodMoy.toFixed(2) + " kW";
   document.getElementById("tProdMax").innerText = prodMax.toFixed(2) + " kW";
   document.getElementById("tEnergie").innerText = energie.toFixed(1) + " kWh";
-}
+  document.getElementById("tEnergieProd").innerText = energieProd.toFixed(1) + " kWh";
+
 
 // ===== Sauvegarde vers le Sheet (avec les appareils) =====
 function saveHistory(time, conso, prod, delta, devices) {
