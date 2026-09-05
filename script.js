@@ -1,12 +1,11 @@
-// ===== Identifiants API =====
-const USER_ID = "us-east1:2e44f066-1ee0-4353-9885-97ee102980bc";
+const USER_ID = "us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc";
 const TOKEN = "eyJraWQiOiJ0Z0NRSUg5U3hlZW9jcWdLWjV0aXFpbVZzOFlMV1hLTnJhOWMzcUNZVEU4PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhM2U3NzNhZS1hYWE4LTRmMzMtYmRiZS1hOWFhMzA5MzlmYWEiLCJkZXZpY2Vfa2V5IjoidXMtZWFzdC0xX2NkNTkyYWRjLTFiMTQtNGY5ZS1hOTFjLTc2ZGViN2M5ZmUyNCIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdtZWFzdC0xX05JcWFJV040cCIsImNsaWVudF9pZCI6IjQ4czNycGltMTg0N2x2bmZkOHBjZTlnHFoIiwiZXZlbnRfaWQiOiI0ZGY1MTYyMy1lZmIyLTQ0YTMtYjNjNC0yYjNjZWY4YzVmMzgiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNzg0NDg3MTM5LCJleHAiOjE3ODQ1NzM1NDIsImlhdCI6MTc4NDQ4NzE0MiwianRpIjoiYjFhN2Y1ODgtYjAxNy00N2E1LWIzNzItOWQzODhmZGFjM2MyIiwidXNlcm5hbWUiOiJyYW5kYV9hZG1pbiJ9.RuMmzICPjMXagtmE_wJXHFpb-Acd2hASJjzgEHzoigvkhdmA9P1q8BfvRe3cydAyaAjJ8kr6OGT4lDuQg5UQEVY0klzchMWB0vkHKy0uOn5HQkjz6S4yCRg0OW2yT4fcMxKh5zS_aCOwm0k_t46QwMsy9C-BbEEirOghwPEFrf04pqCEl5xvLvBqC-I13dodBIlJZeWJEdUy2ehqBWjEYJZkfwOg4qebY7I26RYOK9II7-2doBwdbzysBML9xkf7G0INqG75YlsgKplIgtHiuGbktXWaRc3Ja2SsUkIzZqBwbRpSHBj31iaorkufZTJeNBLlndCk0AXG07vk0dqK-A";
 const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
-const URL = "https://uufyt92ekc.execute-api.us-east-.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
+const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
 // ===== Google Sheet Web App =====
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxJaBXBbJug7i2ijsFYqhdKLp5ZWfQv4PWy-qKNhompWUYwtoJ_RCZydplCIrC2j7M/exec";
+const SHEET_URL = "https://script.google.com/macros/sKfycbxJaBXBbJug7i2ijsFYqhdKLp5ZWfQv4PWy-qKNhompWUYwtoJ_RCZydplCIrC2j7M/exec";
 
 const ORDER = [
   "W3pGNRR01016",
@@ -21,9 +20,9 @@ const NAME = {
   W3pGNRR01016: "Groupe 1",
   W3pGNRR01017: "Groupe 2",
   W3pGNRR01014: "Randa",
-  W3pGNRR01015: "BVM",
-  W3pGNRR010: "SMT",
-  W3pGNRR01012: "Auxilia"
+  W3pGN01015: "BVM",
+  W3pGNRR01013: "SMT",
+  W3pGNRR01012: "Auxiliaire"
 };
 
 // ===== Chart =====
@@ -37,7 +36,7 @@ const chart = new Chart(ctx, {
       {
         label: "Consommation",
         data: [],
-        borderColor: "#ef444",
+        borderColor: "#ef4444",
         backgroundColor: "rgba(239, 68, 68, 0.12)",
         fill: true,
         borderWidth: 2,
@@ -50,7 +49,7 @@ const chart = new Chart(ctx, {
         borderColor: "#22c55e",
         backgroundColor: "rgba(34, 197, 94, 0.12)",
         fill: true,
-        borderWidth: 2,
+        borderWidth: ,
         tension: 0.2,
         pointRadius: 0
       },
@@ -123,23 +122,18 @@ const chart = new Chart(ctx, {
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    animation: false,          // ⚡ pas d'animation
-    parsing: false,            // ⚡ parsing désactivé
-    normalized: true,          // ⚡ boucles internes plus rapides
-    spanGaps: true,
+    animation: false,
     interaction: {
       mode: "index",
       intersect: false
     },
-    plugins:      legend: {
+    plugins: {
+      legend: {
         labels: {
           color: "white",
           usePointStyle: true,
           pointStyle: "line"
         }
-      },
-      tooltip: {
-        animation: false
       }
     },
     scales: {
@@ -150,7 +144,7 @@ const chart = new Chart(ctx, {
         }
       },
       y: {
-        ticks: {
+       : {
           color: "white"
         }
       }
@@ -181,20 +175,12 @@ function toKw(v) {
 }
 
 // ===== Remplir le sélecteur de jour depuis le Sheet =====
-let daysAbort = null;
-
 async function loadDays() {
   const select = document.getElementById("daySelect");
   const selected = select.value; // garder la sélection actuelle
 
-  // Annuler la requête précédente si encore en cours
-  if (daysAbort) daysAbort.abort();
-  daysAbort = new AbortController();
-
   try {
-    const res = await fetch(SHEET_URL + "?action=days", {
-      signal: daysAbort.signal
-    });
+    const res = await fetch(SHEET_URL + "?action=days");
     const json = await res.json();
 
     if (!json.ok) return;
@@ -218,11 +204,7 @@ async function loadDays() {
     }
 
   } catch (err) {
-    if (err.name !== "AbortError") {
-      console.error("Erreur lecture jours :", err);
-    }
-  } finally {
-    daysAbort = null;
+    console.error("Erreur lecture jours :", err);
   }
 }
 
@@ -250,14 +232,7 @@ function fillHours() {
 }
 
 // ===== Charger le graphique selon jour + période (depuis Google Sheet) =====
-let chartAbort = null;
-
 async function loadChartData() {
-  // ⚡ Annuler la requête précédente si elle n'est pas terminée
-  // (évite l'empilement de requêtes lentes)
-  if (chartAbort) chartAbort.abort();
-  chartAbort = new AbortController();
-
   const daySelect = document.getElementById("daySelect").value;
 
   let day;
@@ -277,7 +252,7 @@ async function loadChartData() {
     "&end=" + encodeURIComponent(end);
 
   try {
-    const res = await fetch(url, { signal: chartAbort.signal });
+    const res = await fetch(url);
     const json = await res.json();
 
     if (!json.ok) throw new Error("read failed");
@@ -285,11 +260,7 @@ async function loadChartData() {
     displayChart(json.data);
 
   } catch (err) {
-    if (err.name !== "AbortError") {
-      console.error("Erreur lecture Sheet :", err);
-    }
-  } finally {
-    chartAbort = null;
+    console.error("Erreur lecture Sheet :", err);
   }
 }
 
@@ -302,9 +273,9 @@ function displayChart(rows) {
   // L'axe X affiche l'HEURE SEULEMENT (pas la date)
   rows.forEach(h => {
     chart.data.labels.push(String(h.time).substring(0, 8));
-    chart.data.datasets[0].data.push.conso);
+    chart.data.datasets[0].data.push(h.conso);
     chart.data.datasets[1].data.push(h.prod);
-    chart.data.datasets[2].data.push(h.delta);   // colonne delta du Sheet
+    chart.data.datasets[2].data.push(h.delta);  // utilise la colonne delta du Sheet
     chart.data.datasets[3].data.push(h.g1    || 0);
     chart.data.datasets[4].data.push(h.g2    || 0);
     chart.data.datasets[5].data.push(h.randa || 0);
@@ -313,8 +284,7 @@ function displayChart(rows) {
     chart.data.datasets[8].data.push(h.aux   || 0);
   });
 
-  // ⚡ Mise à jour instantanée, sans animation
-  chart.update("none");
+  chart.update();
 
   // ===== Tendances =====
   if (rows.length === 0) {
@@ -333,7 +303,7 @@ function displayChart(rows) {
   const consoMoy = consoVals.reduce((a, b) => a + b, 0) / consoVals.length;
   const prodMoy = prodVals.reduce((a, b) => a + b, 0) / prodVals.length;
   const consoMax = Math.max(...consoVals);
-  const prodMax = Math.max(...prodVals);
+  const prodMax = Math.maxprodVals);
 
   // ===== Énergie précise : écarts d'horaires réels =====
 
@@ -346,7 +316,7 @@ function displayChart(rows) {
   // Durée max entre 2 points avant de considérer une coupure
   const MAX_GAP_SEC = 300; // 5 minutes
 
-  energie = 0;       // kWh consommés
+  let energie = 0;       // kWh consommés
   let energieProd = 0;   // kWh produits
 
   for (let i = 1; i < rows.length; i++) {
@@ -357,8 +327,8 @@ function displayChart(rows) {
 
     // durée en heures × puissance moyenne entre les 2 points (trapèzes)
     const hours = dt / 3600;
-    energie     += hours * (rows[i].conso + rows[i - 1].conso) / 2;
-    energieProd += hours * (rows[i].prod  + rows[i - 1].prod)  / 2;
+    energie      += hours * (rows[i].conso + rows[i - 1].conso) / 2;
+    energieProd  += hours * (rows[i].prod  + rows[i - 1].prod)  / 2;
   }
 
   document.getElementById("tConsoMoy").innerText = consoMoy.toFixed(2) + " kW";
@@ -416,7 +386,7 @@ function getStegPeriod() {
   }
 
   // ===== Juin à Août =====
-  // Jour : 6h30→830 et 13h30→19h | Pointe matin été : 8h30→13h30
+  // Jour : 6h30→8h30 et 13h30→19h | Pointe matin été : 8h30→13h30
   // Pointe soir : 19h → 22h | Nuit : 22h → 6h30
   if (t >= 22 || t < 6.5)
     return { name: "Nuit", type: "offpeak" };
@@ -443,18 +413,13 @@ function updateStegUI() {
     msg.style.color = "#ef4444";
   } else {
     msg.innerText =
-      "✅ Suivre la consommation vs production";
+     ✅ Suivre la consommation vs production";
     msg.style.color = "#22c55e";
   }
 }
 
 // ===== Temps réel (cartes + sections + sauvegarde Sheet) =====
-let apiBusy = false; // ⚡ évite les requêtes qui s'empilent
-
 async function load() {
-
-  if (apiBusy) return; // la requête précédente est encore en cours
-  apiBusy = true;
 
   try {
 
@@ -487,7 +452,8 @@ async function load() {
     const g2 = get("W3pGNRR01017");
 
     const randa = get("W3pGNRR01014");
-    const bvm = get("W3pGNRR01015    const smt = get("W3pGNRR01013");
+    const bvm = get("W3pGNRR01015");
+    const smt = get("W3pGNRR01013");
 
     const aux = get("W3pGNRR01012") * 2;
 
@@ -504,11 +470,9 @@ async function load() {
     document.getElementById("delta").innerText =
       delta.toFixed(2) + " kW";
 
-    let = "";
+    let html =    ORDER.forEach(id => {
 
-    ORDER.forEach(id => {
-
-      let value = get(id);
+      value = get(id);
 
       if (id === "W3pGNRR01012")
         value *= 2;
@@ -555,10 +519,7 @@ async function load() {
     document.getElementById("stegMessage").innerText =
       "❌ Impossible de récupérer les données.";
 
-    document.getElementById("stegMessage").style.color = "#ef4444";
-
-  } finally {
-    apiBusy = false;
+    document.getElementById("stegMessage").style.color "#ef4444";
   }
 }
 
@@ -572,13 +533,12 @@ load();
 setInterval(load, 10000);
 
 // LIVE : recharger le graphique depuis Google Sheet toutes les 10s
-// (uniquement si "Temps réel (Live)" est sélectionné et onlet visible)
+// (uniquement si "Temps réel (Live)" est sélectionné)
 setInterval(() => {
-  if (document.hidden) return; // ⚡ rien en arrière-plan
   if (document.getElementById("daySelect").value === "today") {
     loadChartData();
   }
 }, 10000);
 
 // Recharger la liste des dates toutes les heures
-// setInterval(loadDays, 3600000);
+//setInterval(loadDays, 3600000);
