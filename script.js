@@ -1,11 +1,11 @@
 const USER_ID = "us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc";
-const TOKEN = "eyJraWQiOiJ0Z0NRSUg5U3hlZW9jcWdLWjV0aXFpbVZzOFlMV1hLTnJhOWMzcUNZVEU4PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhM2U3NzNhZS1hYWE4LTRmMzMtYmRiZS1hOWFhMzA5MzlmYWEiLCJkZXZpY2Vfa2V5IjoidXMtZWFzdC0xX2NkNTkyYWRjLTFiMTQtNGY5ZS1hOTFjLTc2ZGViN2M5ZmUyNCIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xX05JcWFJV040cCIsImNsaWVudF9pZCI6IjQ4czNycGltMTg0N2x2bmZkOHBjZTlnbHFoIiwiZXZlbnRfaWQiOiI0ZGY1MTYyMy1lZmIyLTQ0YTMtYjNjNC0yYjNjZWY4YzVmMzgiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNzg0NDg3MTM5LCJleHAiOjE3ODQ1NzM1NDIsImlhdCI6MTc4NDQ4NzE0MiwianRpIjoiYjFhN2Y1ODgtYjAxNy00N2E1LWIzNzItOWQzODhmZGFjM2MyIiwidXNlcm5hbWUiOiJyYW5kYV9hZG1pbiJ9.RuMmzICPjMXagtmE_wJXHFpb-Acd2hASJjzgEHzoigvkhdmA9P1q8BfvRe3cydAyaAjJ8kr6OGT4lDuQg5UQEVY0klzchMWB0vkHKy0uOn5HQkjz6S4yCRg0OW2yT4fcMxKh5zS_aCOwm0k_t46QwMsy9C-BbEEirOghwPEFrf04pqCEl5xvLvBqC-I13dodBIlJZeWJEdUy2ehqBWjEYJZkfwOg4qebY7I26RYOK9II7-2doBwdbzysBML9xkf7G0INqG75YlsgKplIgtHiuGbktXWaRc3Ja2SsUkIzZqBwbRpSHBj31iaorkufZTJeNBLlndCk0AXG07vk0dqK-A";
+const TOKEN = "eyJraWQiOiJ0Z0NRSUg5U3hlZW9jcWdLWjV0aXFpbVZzOFlMV1hLTnJhOWMzcUNZVEU4PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhM2U3NzNhZS1hYWE4LTRmMzMtYmRiZS1hOWFhMzA5MzlmYWEiLCJkZXZpY2Vfa2V5IjoidXMtZWFzdC0xX2NkNTkyYWRjLTFiMTQtNGY5ZS1hOTFjLTc2ZGViN2M5ZmUyNCIsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdtZWFzdC0xX05JcWFJV040cCIsImNsaWVudF9pZCI6IjQ4czNycGltMTg0N2x2bmZkOHBjZTlnHFoIiwiZXZlbnRfaWQiOiI0ZGY1MTYyMy1lZmIyLTQ0YTMtYjNjNC0yYjNjZWY4YzVmMzgiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNzg0NDg3MTM5LCJleHAiOjE3ODQ1NzM1NDIsImlhdCI6MTc4NDQ4NzE0MiwianRpIjoiYjFhN2Y1ODgtYjAxNy00N2E1LWIzNzItOWQzODhmZGFjM2MyIiwidXNlcm5hbWUiOiJyYW5kYV9hZG1pbiJ9.RuMmzICPjMXagtmE_wJXHFpb-Acd2hASJjzgEHzoigvkhdmA9P1q8BfvRe3cydAyaAjJ8kr6OGT4lDuQg5UQEVY0klzchMWB0vkHKy0uOn5HQkjz6S4yCRg0OW2yT4fcMxKh5zS_aCOwm0k_t46QwMsy9C-BbEEirOghwPEFrf04pqCEl5xvLvBqC-I13dodBIlJZeWJEdUy2ehqBWjEYJZkfwOg4qebY7I26RYOK9II7-2doBwdbzysBML9xkf7G0INqG75YlsgKplIgtHiuGbktXWaRc3Ja2SsUkIzZqBwbRpSHBj31iaorkufZTJeNBLlndCk0AXG07vk0dqK-A";
 const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
 // ===== Google Sheet Web App =====
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxJaBXBbJug7i2ijsFYqhdKLp5ZWfQv4PWy-qKNhompWUYwtoJ_R7CZydplCIrC2j7M/exec";
+const SHEET_URL = "https://script.google.com/macros/sKfycbxJaBXBbJug7i2ijsFYqhdKLp5ZWfQv4PWy-qKNhompWUYwtoJ_RCZydplCIrC2j7M/exec";
 
 const ORDER = [
   "W3pGNRR01016",
@@ -20,7 +20,7 @@ const NAME = {
   W3pGNRR01016: "Groupe 1",
   W3pGNRR01017: "Groupe 2",
   W3pGNRR01014: "Randa",
-  W3pGNRR01015: "BVM",
+  W3pGN01015: "BVM",
   W3pGNRR01013: "SMT",
   W3pGNRR01012: "Auxiliaire"
 };
@@ -49,7 +49,7 @@ const chart = new Chart(ctx, {
         borderColor: "#22c55e",
         backgroundColor: "rgba(34, 197, 94, 0.12)",
         fill: true,
-        borderWidth: 2,
+        borderWidth: ,
         tension: 0.2,
         pointRadius: 0
       },
@@ -144,7 +144,7 @@ const chart = new Chart(ctx, {
         }
       },
       y: {
-        ticks: {
+       : {
           color: "white"
         }
       }
@@ -303,7 +303,7 @@ function displayChart(rows) {
   const consoMoy = consoVals.reduce((a, b) => a + b, 0) / consoVals.length;
   const prodMoy = prodVals.reduce((a, b) => a + b, 0) / prodVals.length;
   const consoMax = Math.max(...consoVals);
-  const prodMax = Math.max(...prodVals);
+  const prodMax = Math.maxprodVals);
 
   // ===== Énergie précise : écarts d'horaires réels =====
 
@@ -314,7 +314,6 @@ function displayChart(rows) {
   }
 
   // Durée max entre 2 points avant de considérer une coupure
-  // (au-delà, on ne compte pas l'énergie — évite de compter les nuits/pannes)
   const MAX_GAP_SEC = 300; // 5 minutes
 
   let energie = 0;       // kWh consommés
@@ -326,7 +325,7 @@ function displayChart(rows) {
     // Ignorer les trous (dashboard fermé, coupure, changement de période...)
     if (dt <= 0 || dt > MAX_GAP_SEC) continue;
 
-    // durée en heures × puissance moyenne entre les 2 points (méthode des trapèzes)
+    // durée en heures × puissance moyenne entre les 2 points (trapèzes)
     const hours = dt / 3600;
     energie      += hours * (rows[i].conso + rows[i - 1].conso) / 2;
     energieProd  += hours * (rows[i].prod  + rows[i - 1].prod)  / 2;
@@ -338,7 +337,7 @@ function displayChart(rows) {
   document.getElementById("tProdMax").innerText = prodMax.toFixed(2) + " kW";
   document.getElementById("tEnergie").innerText = energie.toFixed(1) + " kWh";
   document.getElementById("tEnergieProd").innerText = energieProd.toFixed(1) + " kWh";
-}   // ← fin de displayChart() ✅
+}
 
 // ===== Sauvegarde vers le Sheet (avec les appareils) =====
 function saveHistory(time, conso, prod, delta, devices) {
@@ -362,30 +361,43 @@ function saveHistory(time, conso, prod, delta, devices) {
   }).catch(err => console.error("Erreur Sheet :", err));
 }
 
-// ===== Régime STEG =====
+// ===== Régime STEG (saisonnier) =====
 function getStegPeriod() {
   const now = new Date();
+  const month = now.getMonth() + 1; // 1 = Janvier ... 12 = Décembre
+  const t = now.getHours() + now.getMinutes() / 60;
 
   // Dimanche : tarif nuit toute la journée
   if (now.getDay() === 0) {
     return { name: "Nuit (Dimanche)", type: "offpeak" };
   }
 
-  const t = now.getHours() + now.getMinutes() / 60;
+  // ===== Septembre à Mai =====
+  // Jour : 7h → 18h | Pointe soir : 18h → 21h | Nuit : 21h → 7h
+  if (month >= 9 || month <= 5) {
 
+    if (t >= 21 || t < 7)
+      return { name: "Nuit", type: "offpeak" };
+
+    if (t >= 18)
+      return { name: "Pointe soir", type: "peak" };
+
+    return { name: "Jour", type: "normal" };
+  }
+
+  // ===== Juin à Août =====
+  // Jour : 6h30→8h30 et 13h30→19h | Pointe matin été : 8h30→13h30
+  // Pointe soir : 19h → 22h | Nuit : 22h → 6h30
   if (t >= 22 || t < 6.5)
     return { name: "Nuit", type: "offpeak" };
 
-  if (t >= 6.5 && t < 8.5)
-    return { name: "Jour", type: "normal" };
+  if (t >= 19)
+    return { name: "Pointe soir", type: "peak" };
 
   if (t >= 8.5 && t < 13.5)
-    return { name: "Pointe jour", type: "peak" };
+    return { name: "Pointe matin été", type: "peak" };
 
-  if (t >= 13.5 && t < 19)
-    return { name: "Jour", type: "normal" };
-
-  return { name: "Pointe soir", type: "peak" };
+  return { name: "Jour", type: "normal" };
 }
 
 function updateStegUI() {
@@ -401,7 +413,7 @@ function updateStegUI() {
     msg.style.color = "#ef4444";
   } else {
     msg.innerText =
-      "✅ Suivre la consommation vs production";
+     ✅ Suivre la consommation vs production";
     msg.style.color = "#22c55e";
   }
 }
@@ -458,11 +470,9 @@ async function load() {
     document.getElementById("delta").innerText =
       delta.toFixed(2) + " kW";
 
-    let html = "";
+    let html =    ORDER.forEach(id => {
 
-    ORDER.forEach(id => {
-
-      let value = get(id);
+      value = get(id);
 
       if (id === "W3pGNRR01012")
         value *= 2;
@@ -509,7 +519,7 @@ async function load() {
     document.getElementById("stegMessage").innerText =
       "❌ Impossible de récupérer les données.";
 
-    document.getElementById("stegMessage").style.color = "#ef4444";
+    document.getElementById("stegMessage").style.color "#ef4444";
   }
 }
 
