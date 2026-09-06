@@ -191,11 +191,17 @@ async function loadDays() {
       select.remove(1);
     }
 
-    // Ajouter les dates trouvées dans le Sheet
-    json.days.forEach(d => {
+    // Trier du plus récent au plus ancien
+    const days = json.days.sort().reverse();
+
+    // Ajouter les dates (format affiché : jj/mm/aaaa)
+    days.forEach(d => {
       const opt = document.createElement("option");
-      opt.value = d;
-      opt.textContent = d;
+      opt.value = d;   // la valeur reste yyyy-MM-dd (pour la requête)
+
+      const [y, m, day] = d.split("-");
+      opt.textContent = `day/{day}/day/{m}/${y}`;
+
       select.appendChild(opt);
     });
 
@@ -208,7 +214,6 @@ async function loadDays() {
     console.error("Erreur lecture jours :", err);
   }
 }
-
 // ===== Remplir les sélecteurs d'heures =====
 function fillHours() {
   const start = document.getElementById("startHour");
