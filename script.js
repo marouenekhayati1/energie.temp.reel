@@ -186,21 +186,22 @@ async function loadDays() {
 
     if (!json.ok) return;
 
-    // Supprimer les anciennes options de dates (garder "today")
-    while (select.options.length > 1) {
-      select.remove(1);
-    }
+    // Vider complètement le sélecteur
+    select.innerHTML = "";
 
-    // Trier du plus récent au plus ancien
+    const t = todayStr();
     const days = json.days.sort().reverse();
 
-    // Ajouter les dates (format affiché : jj/mm/aaaa)
+    // Ajouter les dates (la plus récente en premier)
     days.forEach(d => {
       const opt = document.createElement("option");
-      opt.value = d;   // la valeur reste yyyy-MM-dd (pour la requête)
+      opt.value = d;
 
       const [y, m, day] = d.split("-");
       opt.textContent = `day/{day}/day/{m}/${y}`;
+
+      // Si c'est aujourd'hui → ajouter " live"
+      if (d === t) opt.textContent += " live";
 
       select.appendChild(opt);
     });
@@ -214,6 +215,7 @@ async function loadDays() {
     console.error("Erreur lecture jours :", err);
   }
 }
+
 // ===== Remplir les sélecteurs d'heures =====
 function fillHours() {
   const start = document.getElementById("startHour");
@@ -239,14 +241,7 @@ function fillHours() {
 
 // ===== Charger le graphique selon jour + période (depuis Google Sheet) =====
 async function loadChartData() {
-  const daySelect = document.getElementById("daySelect").value;
-
-  let day;
-  if (daySelect === "today") {
-    day = todayStr();
-  } else {
-    day = daySelect;
-  }
+  const day = document.getElementById("daySelect").value;
 
   const start = document.getElementById("startHour").value;
   const end = document.getElementById("endHour").value;
@@ -541,12 +536,12 @@ load();
 setInterval(load, 10000);
 
 // LIVE : recharger le graphique depuis Google Sheet toutes les 10s
-// (uniquement si "Temps réel (Live)" est sélectionné)
+// (uniquement si le jour sélectionné est aujourd'hui)
 setInterval(() => {
-  if (document.getElementById("daySelect").value === "today") {
+  if (document.getElementById("daySelect").value === todayStr()) {
     loadChartData();
   }
 }, 10000);
 
 // Recharger la liste des dates toutes les heures
-//setInterval(loadDays, 3600000);
+setInterval(loadDays, 3600000);
