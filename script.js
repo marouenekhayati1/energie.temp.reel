@@ -197,11 +197,19 @@ async function loadDays() {
       const opt = document.createElement("option");
       opt.value = d;
 
-      const [y, m, day] = d.split("-");
-      opt.textContent = `day/{day}/day/{m}/${y}`;
+      const parts = d.split("-");
+      const y = parts[0];
+      const m = parts[1];
+      const day = parts[2];
+
+      let label = day + "/" + m + "/" + y;
 
       // Si c'est aujourd'hui → ajouter " live"
-      if (d === t) opt.textContent += " live";
+      if (d === t) {
+        label = label + " live";
+      }
+
+      opt.textContent = label;
 
       select.appendChild(opt);
     });
