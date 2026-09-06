@@ -251,6 +251,8 @@ function fillHours() {
 async function loadChartData() {
   const day = document.getElementById("daySelect").value;
 
+  if (!day) return; // sélecteur pas encore rempli
+
   const start = document.getElementById("startHour").value;
   const end = document.getElementById("endHour").value;
 
@@ -284,7 +286,7 @@ function displayChart(rows) {
     chart.data.labels.push(String(h.time).substring(0, 8));
     chart.data.datasets[0].data.push(h.conso);
     chart.data.datasets[1].data.push(h.prod);
-    chart.data.datasets[2].data.push(h.delta);  // utilise la colonne delta du Sheet
+    chart.data.datasets[2].data.push(h.delta);
     chart.data.datasets[3].data.push(h.g1    || 0);
     chart.data.datasets[4].data.push(h.g2    || 0);
     chart.data.datasets[5].data.push(h.randa || 0);
@@ -537,8 +539,10 @@ async function load() {
 // ===== Initialisation =====
 fillHours();
 loadDays();
-loadChartData();
 load();
+
+// Attendre que le sélecteur soit rempli avant le premier chargement du graphe
+setTimeout(loadChartData, 1500);
 
 // Cartes temps réel toutes les 10s
 setInterval(load, 10000);
