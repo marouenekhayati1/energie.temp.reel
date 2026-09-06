@@ -5,7 +5,7 @@ const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
 // ===== Google Sheet Web App =====
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbzfhZRXaXQompE3ADJo7y8PW49oolbKIDRnhgd0HcN-0VeCkPkMosev6-ua_NHxFigc4Q/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxszs4mStiOaHPLpIEQnq6_URck1xALXGraWhyjOck2rtvc1AQZeWS6DFOxEfLZLQCE/exec";
 
 
 const ORDER = [
