@@ -11,7 +11,10 @@
 
 <body>
 
-<h1>⚡ WattNow Dashboard</h1>
+<div class="header-nav">
+  <h1>⚡ WattNow Dashboard</h1>
+  <a href="stoppages.html" class="nav-btn">🛑 Suivi des Arrêts (G1 & G2)</a>
+</div>
 
 <div class="grid">
 
@@ -87,77 +90,6 @@
 
 <div class="chart-container">
   <canvas id="chart"></canvas>
-</div>
-
-<!-- ===== ANALYSE DES ARRÊTS DES GROUPES ===== -->
-<div class="stoppage-section card">
-  <h2>🛑 Suivi des Arrêts (Groupe 1 & Groupe 2)</h2>
-  
-  <div class="controls" style="margin-bottom: 20px;">
-    <label for="monthSelect">📅 Sélectionner un Mois :</label>
-    <input type="month" id="monthSelect" onchange="loadStoppagesData()">
-    <button onclick="loadStoppagesData()">🔍 Analyser</button>
-  </div>
-
-  <!-- Totaux Mensuels -->
-  <div class="trends" style="margin-bottom: 20px;">
-    <div class="trend">
-      <div>G1 Correctifs Totaux</div>
-      <div id="g1TotCorr" class="t-value">0 (0h 0m)</div>
-    </div>
-    <div class="trend">
-      <div>G1 Préventifs Totaux</div>
-      <div id="g1TotPrev" class="t-value">0 (0h 0m)</div>
-    </div>
-    <div class="trend">
-      <div>G2 Correctifs Totaux</div>
-      <div id="g2TotCorr" class="t-value">0 (0h 0m)</div>
-    </div>
-    <div class="trend">
-      <div>G2 Préventifs Totaux</div>
-      <div id="g2TotPrev" class="t-value">0 (0h 0m)</div>
-    </div>
-  </div>
-
-  <div class="tables-grid">
-    <!-- Tableau Groupe 1 -->
-    <div class="table-container">
-      <h3>⚡ Groupe 1 (G1)</h3>
-      <table class="stoppage-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Début</th>
-            <th>Fin</th>
-            <th>Durée</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody id="g1TableBody">
-          <tr><td colspan="5">Sélectionnez un mois</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Tableau Groupe 2 -->
-    <div class="table-container">
-      <h3>⚡ Groupe 2 (G2)</h3>
-      <table class="stoppage-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Début</th>
-            <th>Fin</th>
-            <th>Durée</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody id="g2TableBody">
-          <tr><td colspan="5">Sélectionnez un mois</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
 </div>
 
 <script src="script.js"></script>
