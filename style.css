@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: #0f172a;
   color: white;
   padding: 20px;
@@ -9,6 +9,31 @@ body {
 }
 
 h1 { margin-bottom: 15px; }
+
+/* Navigation entre pages */
+.header-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nav-btn {
+  background: #3b82f6;
+  color: white;
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: #2563eb;
+}
 
 .grid {
   display: grid;
@@ -68,7 +93,7 @@ canvas {
   height: 100% !important;
 }
 
-/* ===== Sélecteur de période ===== */
+/* ===== Controls ===== */
 .controls {
   margin-top: 20px;
   background: #1e293b;
@@ -134,7 +159,7 @@ canvas {
 
 /* ===== Section Tableau des Arrêts ===== */
 .stoppage-section {
-  margin-top: 30px;
+  margin-top: 20px;
   text-align: left;
 }
 
