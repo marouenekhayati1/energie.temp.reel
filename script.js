@@ -5,8 +5,8 @@ const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
 
 // ===== Google Sheet Web App =====
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxszs4mStiOaHPLpIEQnq6_URck1xALXGraWhyjOck2rtvc1AQZeWS6DFOxEfLZLQCE/exec";
-
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyt8R7nLqvJ5JZ52RNuHcM9WHSWxXRoY82mBwcIuHUdUbep46SHx3CfcAbnRbPSb5RgNw/exec";
+            
 
 const ORDER = [
   "W3pGNRR01016",
@@ -155,7 +155,6 @@ const chart = new Chart(ctx, {
 
 // ===== Helpers date / heure =====
 
-// Date du jour au format yyyy-mm-dd
 function todayStr() {
   const n = new Date();
   return n.getFullYear() + "-" +
@@ -175,10 +174,26 @@ function toKw(v) {
   return Number(v || 0) / 1000;
 }
 
+function timeToSec(t) {
+  const p = String(t).substring(0, 8).split(":");
+  return (Number(p[0] || 0) * 3600) + (Number(p[1] || 0) * 60) + Number(p[2] || 0);
+}
+
+function formatDuration(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = Math.floor(sec % 60);
+  let res = "";
+  if (h > 0) res += h + "h ";
+  if (m > 0 || h > 0) res += m + "m ";
+  res += s + "s";
+  return res;
+}
+
 // ===== Remplir le sélecteur de jour depuis le Sheet =====
 async function loadDays() {
   const select = document.getElementById("daySelect");
-  const selected = select.value; // garder la sélection actuelle
+  const selected = select.value;
 
   try {
     const res = await fetch(SHEET_URL + "?action=days");
@@ -186,13 +201,11 @@ async function loadDays() {
 
     if (!json.ok) return;
 
-    // Vider complètement le sélecteur
     select.innerHTML = "";
 
     const t = todayStr();
     const days = json.days.sort().reverse();
 
-    // Ajouter les dates (la plus récente en premier)
     days.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d;
@@ -204,17 +217,14 @@ async function loadDays() {
 
       let label = day + "/" + m + "/" + y;
 
-      // Si c'est aujourd'hui → ajouter " live"
       if (d === t) {
         label = label + " live";
       }
 
       opt.textContent = label;
-
       select.appendChild(opt);
     });
 
-    // Restaurer la sélection si elle existe encore
     if (selected) {
       select.value = selected;
     }
@@ -247,11 +257,10 @@ function fillHours() {
   end.value = "23";
 }
 
-// ===== Charger le graphique selon jour + période (depuis Google Sheet) =====
+// ===== Charger le graphique selon jour + période =====
 async function loadChartData() {
   const day = document.getElementById("daySelect").value;
-
-  if (!day) return; // sélecteur pas encore rempli
+  if (!day) return;
 
   const start = document.getElementById("startHour").value;
   const end = document.getElementById("endHour").value;
@@ -277,11 +286,9 @@ async function loadChartData() {
 
 // ===== Afficher les données + tendance =====
 function displayChart(rows) {
-  // Vider le graphique
   chart.data.labels = [];
   chart.data.datasets.forEach(ds => ds.data = []);
 
-  // L'axe X affiche l'HEURE SEULEMENT (pas la date)
   rows.forEach(h => {
     chart.data.labels.push(String(h.time).substring(0, 8));
     chart.data.datasets[0].data.push(h.conso);
@@ -297,7 +304,6 @@ function displayChart(rows) {
 
   chart.update();
 
-  // ===== Tendances =====
   if (rows.length === 0) {
     document.getElementById("tConsoMoy").innerText = "---";
     document.getElementById("tConsoMax").innerText = "---";
@@ -316,27 +322,14 @@ function displayChart(rows) {
   const consoMax = Math.max(...consoVals);
   const prodMax = Math.max(...prodVals);
 
-  // ===== Énergie précise : écarts d'horaires réels =====
-
-  // Convertit "HH:mm:ss" en secondes depuis minuit
-  function timeToSec(t) {
-    const p = String(t).substring(0, 8).split(":");
-    return (Number(p[0]) * 3600) + (Number(p[1]) * 60) + Number(p[2]);
-  }
-
-  // Durée max entre 2 points avant de considérer une coupure
-  const MAX_GAP_SEC = 300; // 5 minutes
-
-  let energie = 0;       // kWh consommés
-  let energieProd = 0;   // kWh produits
+  const MAX_GAP_SEC = 300;
+  let energie = 0;
+  let energieProd = 0;
 
   for (let i = 1; i < rows.length; i++) {
     const dt = timeToSec(rows[i].time) - timeToSec(rows[i - 1].time);
-
-    // Ignorer les trous (dashboard fermé, coupure, changement de période...)
     if (dt <= 0 || dt > MAX_GAP_SEC) continue;
 
-    // durée en heures × puissance moyenne entre les 2 points (trapèzes)
     const hours = dt / 3600;
     energie      += hours * (rows[i].conso + rows[i - 1].conso) / 2;
     energieProd  += hours * (rows[i].prod  + rows[i - 1].prod)  / 2;
@@ -350,7 +343,7 @@ function displayChart(rows) {
   document.getElementById("tEnergieProd").innerText = energieProd.toFixed(1) + " kWh";
 }
 
-// ===== Sauvegarde vers le Sheet (avec les appareils) =====
+// ===== Sauvegarde vers le Sheet =====
 function saveHistory(time, conso, prod, delta, devices) {
   fetch(SHEET_URL, {
     method: "POST",
@@ -372,68 +365,45 @@ function saveHistory(time, conso, prod, delta, devices) {
   }).catch(err => console.error("Erreur Sheet :", err));
 }
 
-// ===== Régime STEG (saisonnier) =====
+// ===== Régime STEG =====
 function getStegPeriod() {
   const now = new Date();
-  const month = now.getMonth() + 1; // 1 = Janvier ... 12 = Décembre
+  const month = now.getMonth() + 1;
   const t = now.getHours() + now.getMinutes() / 60;
 
-  // Dimanche : tarif nuit toute la journée
   if (now.getDay() === 0) {
     return { name: "Nuit (Dimanche)", type: "offpeak" };
   }
 
-  // ===== Septembre à Mai =====
-  // Jour : 7h → 18h | Pointe soir : 18h → 21h | Nuit : 21h → 7h
   if (month >= 9 || month <= 5) {
-
-    if (t >= 21 || t < 7)
-      return { name: "Nuit", type: "offpeak" };
-
-    if (t >= 18)
-      return { name: "Pointe soir", type: "peak" };
-
+    if (t >= 21 || t < 7) return { name: "Nuit", type: "offpeak" };
+    if (t >= 18) return { name: "Pointe soir", type: "peak" };
     return { name: "Jour", type: "normal" };
   }
 
-  // ===== Juin à Août =====
-  // Jour : 6h30→8h30 et 13h30→19h | Pointe matin été : 8h30→13h30
-  // Pointe soir : 19h → 22h | Nuit : 22h → 6h30
-  if (t >= 22 || t < 6.5)
-    return { name: "Nuit", type: "offpeak" };
-
-  if (t >= 19)
-    return { name: "Pointe soir", type: "peak" };
-
-  if (t >= 8.5 && t < 13.5)
-    return { name: "Pointe matin été", type: "peak" };
-
+  if (t >= 22 || t < 6.5) return { name: "Nuit", type: "offpeak" };
+  if (t >= 19) return { name: "Pointe soir", type: "peak" };
+  if (t >= 8.5 && t < 13.5) return { name: "Pointe matin été", type: "peak" };
   return { name: "Jour", type: "normal" };
 }
 
 function updateStegUI() {
   const p = getStegPeriod();
-
   document.getElementById("stegStatus").innerText = p.name;
-
   const msg = document.getElementById("stegMessage");
 
   if (p.type === "peak") {
-    msg.innerText =
-      "⚠️ Pointe tarifaire – Démarrer les groupes en pleine charge";
+    msg.innerText = "⚠️ Pointe tarifaire – Démarrer les groupes en pleine charge";
     msg.style.color = "#ef4444";
   } else {
-    msg.innerText =
-      "✅ Suivre la consommation vs production";
+    msg.innerText = "✅ Suivre la consommation vs production";
     msg.style.color = "#22c55e";
   }
 }
 
-// ===== Temps réel (cartes + sections + sauvegarde Sheet) =====
+// ===== Temps réel =====
 async function load() {
-
   try {
-
     const res = await fetch(URL, {
       method: "GET",
       headers: {
@@ -444,12 +414,9 @@ async function load() {
       }
     });
 
-    if (!res.ok) {
-      throw new Error("HTTP " + res.status);
-    }
+    if (!res.ok) throw new Error("HTTP " + res.status);
 
     const raw = await res.json();
-
     const map = {};
 
     raw.forEach(d => {
@@ -465,43 +432,25 @@ async function load() {
     const randa = get("W3pGNRR01014");
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
-
     const aux = get("W3pGNRR01012") * 2;
 
     const conso = randa + bvm + smt + aux;
     const prod = g1 + g2;
     const delta = prod - conso;
 
-    document.getElementById("conso").innerText =
-      conso.toFixed(2) + " kW";
-
-    document.getElementById("prod").innerText =
-      prod.toFixed(2) + " kW";
-
-    document.getElementById("delta").innerText =
-      delta.toFixed(2) + " kW";
+    document.getElementById("conso").innerText = conso.toFixed(2) + " kW";
+    document.getElementById("prod").innerText = prod.toFixed(2) + " kW";
+    document.getElementById("delta").innerText = delta.toFixed(2) + " kW";
 
     let html = "";
-
     ORDER.forEach(id => {
-
       let value = get(id);
-
-      if (id === "W3pGNRR01012")
-        value *= 2;
+      if (id === "W3pGNRR01012") value *= 2;
 
       let display = value.toFixed(2) + " kW";
-
-      if (id === "W3pGNRR01016" ||
-          id === "W3pGNRR01017") {
-
+      if (id === "W3pGNRR01016" || id === "W3pGNRR01017") {
         const percent = (value / 2250) * 100;
-
-        display =
-          value.toFixed(2) +
-          " kW (" +
-          percent.toFixed(1) +
-          "%)";
+        display = value.toFixed(2) + " kW (" + percent.toFixed(1) + "%)";
       }
 
       html += `
@@ -526,14 +475,149 @@ async function load() {
     updateStegUI();
 
   } catch (err) {
-
     console.error("Erreur API :", err);
-
-    document.getElementById("stegMessage").innerText =
-      "❌ Impossible de récupérer les données.";
-
+    document.getElementById("stegMessage").innerText = "❌ Impossible de récupérer les données.";
     document.getElementById("stegMessage").style.color = "#ef4444";
   }
+}
+
+// ===== LOGIQUE DE DÉTECTION ET D'ANALYSE DES ARRÊTS =====
+
+async function loadStoppagesData() {
+  const monthInput = document.getElementById("monthSelect");
+  if (!monthInput || !monthInput.value) return;
+
+  const month = monthInput.value;
+  const url = SHEET_URL + "?action=stoppages&month=" + encodeURIComponent(month);
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if (!json.ok) throw new Error("Erreur lors de la récupération des arrêts");
+
+    processAndDisplayStoppages(json.data);
+  } catch (err) {
+    console.error("Erreur chargement arrêts :", err);
+  }
+}
+
+function processAndDisplayStoppages(monthData) {
+  const g1Stoppages = [];
+  const g2Stoppages = [];
+  const POWER_THRESHOLD = 1.0; // Puissance en dessous de laquelle le groupe est considéré à l'arrêt
+
+  Object.keys(monthData).sort().forEach(dateStr => {
+    const rows = monthData[dateStr];
+    if (!rows || rows.length === 0) return;
+
+    let g1Start = null;
+    let g2Start = null;
+
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const curSec = timeToSec(r.time);
+
+      // --- Groupe 1 ---
+      if (r.g1 < POWER_THRESHOLD && g1Start === null) {
+        g1Start = { time: r.time, sec: curSec };
+      } else if (r.g1 >= POWER_THRESHOLD && g1Start !== null) {
+        const durationSec = curSec - g1Start.sec;
+        evaluateAndPush(g1Stoppages, dateStr, g1Start.time, r.time, durationSec);
+        g1Start = null;
+      }
+
+      // --- Groupe 2 ---
+      if (r.g2 < POWER_THRESHOLD && g2Start === null) {
+        g2Start = { time: r.time, sec: curSec };
+      } else if (r.g2 >= POWER_THRESHOLD && g2Start !== null) {
+        const durationSec = curSec - g2Start.sec;
+        evaluateAndPush(g2Stoppages, dateStr, g2Start.time, r.time, durationSec);
+        g2Start = null;
+      }
+    }
+
+    // Traitement si l'arrêt se termine à la fin de la journée
+    if (g1Start !== null) {
+      const lastRow = rows[rows.length - 1];
+      const durationSec = timeToSec(lastRow.time) - g1Start.sec;
+      evaluateAndPush(g1Stoppages, dateStr, g1Start.time, lastRow.time, durationSec);
+    }
+    if (g2Start !== null) {
+      const lastRow = rows[rows.length - 1];
+      const durationSec = timeToSec(lastRow.time) - g2Start.sec;
+      evaluateAndPush(g2Stoppages, dateStr, g2Start.time, lastRow.time, durationSec);
+    }
+  });
+
+  renderStoppageTable("g1TableBody", g1Stoppages);
+  renderStoppageTable("g2TableBody", g2Stoppages);
+
+  updateStoppageTotals("g1TotCorr", "g1TotPrev", g1Stoppages);
+  updateStoppageTotals("g2TotCorr", "g2TotPrev", g2Stoppages);
+}
+
+function evaluateAndPush(list, dateStr, startTime, endTime, durationSec) {
+  const minMinutes = 3;
+  const maxCorrectiveMinutes = 90; // 1h30 en minutes
+
+  const durationMin = durationSec / 60;
+
+  // 1. Si < 3 minutes -> ignoré
+  if (durationMin < minMinutes) return;
+
+  // 2. Entre 3 min et 1h30 -> Correctif, Sinon -> Préventif
+  const type = durationMin <= maxCorrectiveMinutes ? "Correctif" : "Préventif";
+
+  list.push({
+    date: dateStr,
+    start: startTime,
+    end: endTime,
+    durationSec: durationSec,
+    type: type
+  });
+}
+
+function renderStoppageTable(elementId, stoppages) {
+  const tbody = document.getElementById(elementId);
+  tbody.innerHTML = "";
+
+  if (stoppages.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Aucun arrêt à afficher</td></tr>';
+    return;
+  }
+
+  stoppages.forEach(s => {
+    const tr = document.createElement("tr");
+    const badgeClass = s.type === "Correctif" ? "badge-corrective" : "badge-preventive";
+
+    tr.innerHTML = `
+      <td>${s.date}</td>
+      <td>${s.start}</td>
+      <td>${s.end}</td>
+      <td>${formatDuration(s.durationSec)}</td>
+      <td><span class="badge ${badgeClass}">${s.type}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateStoppageTotals(corrId, prevId, stoppages) {
+  let countCorr = 0, durCorr = 0;
+  let countPrev = 0, durPrev = 0;
+
+  stoppages.forEach(s => {
+    if (s.type === "Correctif") {
+      countCorr++;
+      durCorr += s.durationSec;
+    } else {
+      countPrev++;
+      durPrev += s.durationSec;
+    }
+  });
+
+  document.getElementById(corrId).innerText = `${countCorr} (${formatDuration(durCorr)})`;
+  document.getElementById(prevId).innerText = `${countPrev} (${formatDuration(durPrev)})`;
 }
 
 // ===== Initialisation =====
@@ -541,19 +625,24 @@ fillHours();
 loadDays();
 load();
 
-// Attendre que le sélecteur soit rempli avant le premier chargement du graphe
-setTimeout(loadChartData, 1500);
+// Mois par défaut (Mois actuel)
+const now = new Date();
+const currentMonth = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
+const monthInput = document.getElementById("monthSelect");
+if (monthInput) {
+  monthInput.value = currentMonth;
+}
 
-// Cartes temps réel toutes les 10s
+setTimeout(loadChartData, 1500);
+setTimeout(loadStoppagesData, 2000);
+
+// Rafraîchissements automatiques
 setInterval(load, 10000);
 
-// LIVE : recharger le graphique depuis Google Sheet toutes les 10s
-// (uniquement si le jour sélectionné est aujourd'hui)
 setInterval(() => {
   if (document.getElementById("daySelect").value === todayStr()) {
     loadChartData();
   }
 }, 10000);
 
-// Recharger la liste des dates toutes les heures
 setInterval(loadDays, 3600000);
