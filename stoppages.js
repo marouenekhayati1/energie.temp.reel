@@ -1,13 +1,17 @@
 // ===== Google Sheet Web App =====
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyt8R7nLqvJ5JZ52RNuHcM9WHSWxXRoY82mBwcIuHUdUbep46SHx3CfcAbnRbPSb5RgNw/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwadKV0k5zkGP30BskQdTBeUBdiL579h6LSRbulD4urMGES-IK_EgA8JtI3mePDT0uedg/exec";
 
-// Helper : Convertir "HH:mm:ss" en secondes
+const MONTH_NAMES = {
+  "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril",
+  "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août",
+  "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre"
+};
+
 function timeToSec(t) {
   const p = String(t).substring(0, 8).split(":");
   return (Number(p[0] || 0) * 3600) + (Number(p[1] || 0) * 60) + Number(p[2] || 0);
 }
 
-// Helper : Formater la durée
 function formatDuration(sec) {
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
@@ -19,28 +23,122 @@ function formatDuration(sec) {
   return res;
 }
 
-// Initialisation au chargement de la page (Mois en cours)
+function fmtNum(n) {
+  if (n === 0) return "0.0";
+  return Number(n || 0).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   
+  const yearSelect = document.getElementById("yearSelect");
+  if (yearSelect) {
+    yearSelect.innerHTML = "";
+    for (let y = year; y >= 2024; y--) {
+      const opt = document.createElement("option");
+      opt.value = y;
+      opt.textContent = y;
+      yearSelect.appendChild(opt);
+    }
+    yearSelect.value = year;
+  }
+
   const monthInput = document.getElementById("monthSelect");
   if (monthInput) {
     monthInput.value = `${year}-${month}`;
   }
   
+  loadYearlyData();
   loadStoppagesData();
 });
 
+// ===== LOGIQUE BILAN MENSUEL DE L'ANNÉE =====
+async function loadYearlyData() {
+  const yearSelect = document.getElementById("yearSelect");
+  if (!yearSelect || !yearSelect.value) return;
+
+  const year = yearSelect.value;
+  const tbody = document.getElementById("yearlyTableBody");
+  const tfoot = document.getElementById("yearlyTableFoot");
+
+  tbody.innerHTML = '<tr><td colspan="9">Chargement des données...</td></tr>';
+  tfoot.innerHTML = '';
+
+  const url = SHEET_URL + "?action=yearly&year=" + encodeURIComponent(year);
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if (!json.ok) throw new Error("Erreur serveur");
+
+    const mStats = json.monthly;
+    tbody.innerHTML = "";
+
+    let totConso = 0, totProd = 0, totG1 = 0, totG2 = 0;
+    let totRanda = 0, totBvm = 0, totSmt = 0, totAux = 0;
+
+    // Du mois de Décembre à Janvier (ordre décroissant)
+    for (let m = 12; m >= 1; m--) {
+      const mKey = String(m).padStart(2, "0");
+      const d = mStats[mKey] || { conso:0, prod:0, g1:0, g2:0, randa:0, bvm:0, smt:0, aux:0 };
+
+      totConso += d.conso;
+      totProd  += d.prod;
+      totG1    += d.g1;
+      totG2    += d.g2;
+      totRanda += d.randa;
+      totBvm   += d.bvm;
+      totSmt   += d.smt;
+      totAux   += d.aux;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${MONTH_NAMES[mKey]}</b></td>
+        <td class="text-conso">${fmtNum(d.conso)}</td>
+        <td class="text-prod">${fmtNum(d.prod)}</td>
+        <td>${fmtNum(d.g1)}</td>
+        <td>${fmtNum(d.g2)}</td>
+        <td>${fmtNum(d.randa)}</td>
+        <td>${fmtNum(d.bvm)}</td>
+        <td>${fmtNum(d.smt)}</td>
+        <td>${fmtNum(d.aux)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // Ligne des totaux annuels
+    tfoot.innerHTML = `
+      <tr>
+        <td>TOTAL ANNUEL (${year})</td>
+        <td class="text-conso">${fmtNum(totConso)}</td>
+        <td class="text-prod">${fmtNum(totProd)}</td>
+        <td>${fmtNum(totG1)}</td>
+        <td>${fmtNum(totG2)}</td>
+        <td>${fmtNum(totRanda)}</td>
+        <td>${fmtNum(totBvm)}</td>
+        <td>${fmtNum(totSmt)}</td>
+        <td>${fmtNum(totAux)}</td>
+      </tr>
+    `;
+
+  } catch (err) {
+    console.error("Erreur chargement bilan annuel :", err);
+    tbody.innerHTML = '<tr><td colspan="9" style="color:#ef4444;">Erreur lors du chargement des données.</td></tr>';
+  }
+}
+
+// ===== LOGIQUE DES ARRÊTS DU MOIS =====
 async function loadStoppagesData() {
   const monthInput = document.getElementById("monthSelect");
   if (!monthInput || !monthInput.value) return;
 
   const month = monthInput.value;
   
-  document.getElementById("g1TableBody").innerHTML = '<tr><td colspan="5" style="text-align:center;">Chargement...</td></tr>';
-  document.getElementById("g2TableBody").innerHTML = '<tr><td colspan="5" style="text-align:center;">Chargement...</td></tr>';
+  document.getElementById("g1TableBody").innerHTML = '<tr><td colspan="5">Chargement...</td></tr>';
+  document.getElementById("g2TableBody").innerHTML = '<tr><td colspan="5">Chargement...</td></tr>';
 
   const url = SHEET_URL + "?action=stoppages&month=" + encodeURIComponent(month);
 
@@ -48,22 +146,20 @@ async function loadStoppagesData() {
     const res = await fetch(url);
     const json = await res.json();
 
-    if (!json.ok) throw new Error("Erreur lors de la récupération des arrêts");
+    if (!json.ok) throw new Error("Erreur de données");
 
     processAndDisplayStoppages(json.data);
   } catch (err) {
     console.error("Erreur chargement arrêts :", err);
-    document.getElementById("g1TableBody").innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444;">Erreur de chargement</td></tr>';
-    document.getElementById("g2TableBody").innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444;">Erreur de chargement</td></tr>';
+    document.getElementById("g1TableBody").innerHTML = '<tr><td colspan="5" style="color:#ef4444;">Erreur de chargement</td></tr>';
+    document.getElementById("g2TableBody").innerHTML = '<tr><td colspan="5" style="color:#ef4444;">Erreur de chargement</td></tr>';
   }
 }
 
 function processAndDisplayStoppages(monthData) {
   const g1Stoppages = [];
   const g2Stoppages = [];
-  
-  // ⚡ Seuil d'arrêt : Inférieur à 400 Watts (0.4 kW)
-  const POWER_THRESHOLD = 0.4; 
+  const POWER_THRESHOLD = 0.4; // Seuil < 400W
 
   Object.keys(monthData).sort().forEach(dateStr => {
     const rows = monthData[dateStr];
@@ -76,7 +172,6 @@ function processAndDisplayStoppages(monthData) {
       const r = rows[i];
       const curSec = timeToSec(r.time);
 
-      // --- Groupe 1 ---
       if (r.g1 < POWER_THRESHOLD && g1Start === null) {
         g1Start = { time: r.time, sec: curSec };
       } else if (r.g1 >= POWER_THRESHOLD && g1Start !== null) {
@@ -85,7 +180,6 @@ function processAndDisplayStoppages(monthData) {
         g1Start = null;
       }
 
-      // --- Groupe 2 ---
       if (r.g2 < POWER_THRESHOLD && g2Start === null) {
         g2Start = { time: r.time, sec: curSec };
       } else if (r.g2 >= POWER_THRESHOLD && g2Start !== null) {
@@ -95,7 +189,6 @@ function processAndDisplayStoppages(monthData) {
       }
     }
 
-    // Arrêt se terminant en fin de journée
     if (g1Start !== null) {
       const lastRow = rows[rows.length - 1];
       const durationSec = timeToSec(lastRow.time) - g1Start.sec;
@@ -117,14 +210,11 @@ function processAndDisplayStoppages(monthData) {
 
 function evaluateAndPush(list, dateStr, startTime, endTime, durationSec) {
   const minMinutes = 3;
-  const maxCorrectiveMinutes = 90; // 1h30 (en minutes)
+  const maxCorrectiveMinutes = 90;
 
   const durationMin = durationSec / 60;
-
-  // Moins de 3 minutes -> ignoré
   if (durationMin < minMinutes) return;
 
-  // Entre 3 min et 1h30 -> Correctif, au-delà -> Préventif
   const type = durationMin <= maxCorrectiveMinutes ? "Correctif" : "Préventif";
 
   list.push({
@@ -141,7 +231,7 @@ function renderStoppageTable(elementId, stoppages) {
   tbody.innerHTML = "";
 
   if (stoppages.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Aucun arrêt enregistré ce mois</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#94a3b8;">Aucun arrêt enregistré ce mois</td></tr>';
     return;
   }
 
