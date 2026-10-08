@@ -1,28 +1,30 @@
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
+  padding: 0;
+}
+
+body {
   font-family: Arial, sans-serif;
   background: #0f172a;
-  color: white;
+  color: #ffffff;
   padding: 20px;
   max-width: 100vw;
   overflow-x: hidden;
 }
 
-h1 { margin-bottom: 15px; }
-
-/* Navigation entre pages */
 .header-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
 
 .nav-btn {
   background: #3b82f6;
-  color: white;
+  color: #ffffff;
   text-decoration: none;
   padding: 10px 16px;
   border-radius: 8px;
@@ -37,7 +39,7 @@ h1 { margin-bottom: 15px; }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 12px;
 }
 
@@ -54,48 +56,11 @@ h1 { margin-bottom: 15px; }
   margin-top: 6px;
 }
 
-.conso { color: #ef4444; }
-.prod { color: #22c55e; }
+.conso, .text-conso { color: #ef4444; }
+.prod, .text-prod { color: #22c55e; }
 .delta { color: #facc15; }
 
-.message-card {
-  margin-top: 10px;
-}
-
-#stegMessage {
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.devices {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.device {
-  background: #1e293b;
-  padding: 12px;
-  border-radius: 10px;
-}
-
-.chart-container {
-  margin-top: 20px;
-  background: #0b1220;
-  border-radius: 12px;
-  padding: 12px;
-  height: 300px;
-}
-
-canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* ===== Controls ===== */
 .controls {
-  margin-top: 20px;
   background: #1e293b;
   padding: 15px;
   border-radius: 12px;
@@ -103,6 +68,7 @@ canvas {
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  margin-top: 15px;
 }
 
 .controls label {
@@ -113,11 +79,12 @@ canvas {
 .controls select,
 .controls input {
   background: #0b1220;
-  color: white;
+  color: #ffffff;
   border: 1px solid #334155;
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 14px;
+  outline: none;
 }
 
 .controls button {
@@ -129,16 +96,16 @@ canvas {
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .controls button:hover {
   background: #16a34a;
 }
 
-/* ===== Tendances ===== */
 .trends {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 12px;
   margin-top: 15px;
 }
@@ -157,16 +124,11 @@ canvas {
   margin-top: 4px;
 }
 
-/* ===== Section Tableau des Arrêts ===== */
-.stoppage-section {
-  margin-top: 20px;
-  text-align: left;
-}
-
 .tables-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
+  margin-top: 15px;
 }
 
 .table-container {
@@ -177,24 +139,33 @@ canvas {
   overflow-y: auto;
 }
 
-.stoppage-table {
+/* Style unique et réutilisable pour tous les tableaux */
+.data-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
   font-size: 13px;
 }
 
-.stoppage-table th, .stoppage-table td {
-  padding: 8px 10px;
+.data-table th, 
+.data-table td {
+  padding: 10px;
   text-align: center;
   border-bottom: 1px solid #1e293b;
 }
 
-.stoppage-table th {
+.data-table th {
   background: #1e293b;
-  color: #94a3b8;
+  color: #38bdf8;
   position: sticky;
   top: 0;
+  z-index: 10;
+}
+
+.data-table tfoot tr {
+  background: #1e293b;
+  font-weight: bold;
+  border-top: 2px solid #3b82f6;
 }
 
 .badge {
@@ -214,4 +185,17 @@ canvas {
   background: rgba(234, 179, 8, 0.2);
   color: #eab308;
   border: 1px solid #eab308;
+}
+
+.chart-container {
+  margin-top: 20px;
+  background: #0b1220;
+  border-radius: 12px;
+  padding: 12px;
+  height: 300px;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
