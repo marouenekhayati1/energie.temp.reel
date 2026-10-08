@@ -131,3 +131,62 @@ canvas {
   font-weight: bold;
   margin-top: 4px;
 }
+
+/* ===== Section Tableau des Arrêts ===== */
+.stoppage-section {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.table-container {
+  background: #0b1220;
+  padding: 15px;
+  border-radius: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.stoppage-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.stoppage-table th, .stoppage-table td {
+  padding: 8px 10px;
+  text-align: center;
+  border-bottom: 1px solid #1e293b;
+}
+
+.stoppage-table th {
+  background: #1e293b;
+  color: #94a3b8;
+  position: sticky;
+  top: 0;
+}
+
+.badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.badge-corrective {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.badge-preventive {
+  background: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+  border: 1px solid #eab308;
+}
