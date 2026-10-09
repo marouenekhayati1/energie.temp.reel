@@ -13,41 +13,41 @@
 
 <div class="header-nav">
   <h1>⚡ WattNow Dashboard</h1>
-  <a href="stoppages.html" class="nav-btn">🛑 Suivi des Arrêts (G1 & G2)</a>
+  <a href="stoppages.html" class="nav-btn">🛑 Suivi des Arrêts & Bilan Mensuel</a>
 </div>
 
+<!-- Cartes Temps Réel -->
 <div class="grid">
-
   <div class="card">
-    <div>Consommation</div>
-    <div id="conso" class="value conso">0</div>
+    <div class="card-title">Consommation</div>
+    <div id="conso" class="value conso">0 kW</div>
   </div>
 
   <div class="card">
-    <div>Production</div>
-    <div id="prod" class="value prod">0</div>
+    <div class="card-title">Production</div>
+    <div id="prod" class="value prod">0 kW</div>
   </div>
 
   <div class="card">
-    <div>Delta</div>
-    <div id="delta" class="value delta">0</div>
+    <div class="card-title">Delta</div>
+    <div id="delta" class="value delta">0 kW</div>
   </div>
 
   <div class="card">
-    <div>Régime STEG</div>
-    <div id="stegStatus" class="value">---</div>
+    <div class="card-title">Régime STEG</div>
+    <div id="stegStatus" class="value" style="font-size:18px;">---</div>
   </div>
-
 </div>
 
-<div class="card message-card">
-  <div id="stegMessage">Chargement...</div>
+<div class="card message-card" style="margin-top:12px;">
+  <div id="stegMessage">Chargement des données...</div>
 </div>
 
-<h3>Sections</h3>
+<!-- Zone Sections (Groupes et Sites) -->
+<h3 class="section-title">⚡ Sections</h3>
 <div class="devices" id="devices"></div>
 
-<!-- ===== Sélecteur de jour et période ===== -->
+<!-- Sélecteur de jour et d'heures -->
 <div class="controls">
   <label>📅 Jour :</label>
   <select id="daySelect" onchange="loadChartData()"></select>
@@ -59,8 +59,8 @@
   <select id="endHour" onchange="loadChartData()"></select>
 </div>
 
-<!-- ===== Tendances ===== -->
-<h3>📈 Tendance de la période</h3>
+<!-- Tendances de la Période -->
+<h3 class="section-title">📈 Tendance de la Période</h3>
 <div class="trends">
   <div class="trend">
     <div>Conso moyenne</div>
@@ -79,15 +79,16 @@
     <div id="tProdMax" class="t-value">---</div>
   </div>
   <div class="trend">
-    <div>Énergie conso (kWh)</div>
+    <div>Énergie conso</div>
     <div id="tEnergie" class="t-value">---</div>
   </div>
   <div class="trend">
-    <div>Énergie produite (kWh)</div>
+    <div>Énergie produite</div>
     <div id="tEnergieProd" class="t-value">---</div>
   </div>
 </div>
 
+<!-- Graphique -->
 <div class="chart-container">
   <canvas id="chart"></canvas>
 </div>
