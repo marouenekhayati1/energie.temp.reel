@@ -3,20 +3,9 @@ const TOKEN = "eyJraWQiOiJ0Z0NRSUg5U3hlZW9jcWdLWjV0aXFpbVZzOFlMV1hLTnJhOWMzcUNZV
 const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyt8R7nLqvJ5JZ52RNuHcM9WHSWxXRoY82mBwcIuHUdUbep46SHx3CfcAbnRbPSb5RgNw/exec";
 
-// ===== Google Sheet Web App =====
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwadKV0k5zkGP30BskQdTBeUBdiL579h6LSRbulD4urMGES-IK_EgA8JtI3mePDT0uedg/exec";
-
-
-const ORDER = [
-  "W3pGNRR01016",
-  "W3pGNRR01017",
-  "W3pGNRR01014",
-  "W3pGNRR01015",
-  "W3pGNRR01013",
-  "W3pGNRR01012"
-];
-
+const ORDER = ["W3pGNRR01016", "W3pGNRR01017", "W3pGNRR01014", "W3pGNRR01015", "W3pGNRR01013", "W3pGNRR01012"];
 const NAME = {
   W3pGNRR01016: "Groupe 1",
   W3pGNRR01017: "Groupe 2",
@@ -26,254 +15,115 @@ const NAME = {
   W3pGNRR01012: "Auxiliaire"
 };
 
-// ===== Chart =====
+// Initialisation du Chart.js
 const ctx = document.getElementById("chart").getContext("2d");
-
 const chart = new Chart(ctx, {
   type: "line",
   data: {
     labels: [],
     datasets: [
-      {
-        label: "Consommation",
-        data: [],
-        borderColor: "#ef4444",
-        backgroundColor: "rgba(239, 68, 68, 0.12)",
-        fill: true,
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0
-      },
-      {
-        label: "Production",
-        data: [],
-        borderColor: "#22c55e",
-        backgroundColor: "rgba(34, 197, 94, 0.12)",
-        fill: true,
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0
-      },
-      {
-        label: "Delta",
-        data: [],
-        borderColor: "#3b82f6",
-        borderWidth: 2,
-        borderDash: [5, 5],
-        tension: 0.2,
-        pointRadius: 0,
-        hidden: true
-      },
-      {
-        label: "Groupe 1",
-        data: [],
-        borderColor: "#f97316",
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0,
-        hidden: true
-      },
-      {
-        label: "Groupe 2",
-        data: [],
-        borderColor: "#eab308",
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0,
-        hidden: true
-      },
-      {
-        label: "Randa",
-        data: [],
-        borderColor: "#a855f7",
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0,
-        hidden: true
-      },
-      {
-        label: "BVM",
-        data: [],
-        borderColor: "#ec4899",
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0,
-        hidden: true
-      },
-      {
-        label: "SMT",
-        data: [],
-        borderColor: "#14b8a6",
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0,
-        hidden: true
-      },
-      {
-        label: "Auxiliaire",
-        data: [],
-        borderColor: "#64748b",
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 0,
-        hidden: true
-      }
+      { label: "Consommation", data: [], borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.12)", fill: true, borderWidth: 2, tension: 0.2, pointRadius: 0 },
+      { label: "Production", data: [], borderColor: "#22c55e", backgroundColor: "rgba(34, 197, 94, 0.12)", fill: true, borderWidth: 2, tension: 0.2, pointRadius: 0 },
+      { label: "Delta", data: [], borderColor: "#3b82f6", borderWidth: 2, borderDash: [5, 5], tension: 0.2, pointRadius: 0, hidden: true },
+      { label: "Groupe 1", data: [], borderColor: "#f97316", borderWidth: 2, tension: 0.2, pointRadius: 0, hidden: true },
+      { label: "Groupe 2", data: [], borderColor: "#eab308", borderWidth: 2, tension: 0.2, pointRadius: 0, hidden: true },
+      { label: "Randa", data: [], borderColor: "#a855f7", borderWidth: 2, tension: 0.2, pointRadius: 0, hidden: true },
+      { label: "BVM", data: [], borderColor: "#ec4899", borderWidth: 2, tension: 0.2, pointRadius: 0, hidden: true },
+      { label: "SMT", data: [], borderColor: "#14b8a6", borderWidth: 2, tension: 0.2, pointRadius: 0, hidden: true },
+      { label: "Auxiliaire", data: [], borderColor: "#64748b", borderWidth: 2, tension: 0.2, pointRadius: 0, hidden: true }
     ]
   },
   options: {
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
-    interaction: {
-      mode: "index",
-      intersect: false
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: "white",
-          usePointStyle: true,
-          pointStyle: "line"
-        }
-      }
-    },
+    interaction: { mode: "index", intersect: false },
+    plugins: { legend: { labels: { color: "white", usePointStyle: true, pointStyle: "line" } } },
     scales: {
-      x: {
-        ticks: {
-          color: "white",
-          maxTicksLimit: 15
-        }
-      },
-      y: {
-        ticks: {
-          color: "white"
-        }
-      }
+      x: { ticks: { color: "white", maxTicksLimit: 15 } },
+      y: { ticks: { color: "white" } }
     }
   }
 });
 
-// ===== Helpers date / heure =====
-
 function todayStr() {
   const n = new Date();
-  return n.getFullYear() + "-" +
-    String(n.getMonth() + 1).padStart(2, "0") + "-" +
-    String(n.getDate()).padStart(2, "0");
+  return n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0");
 }
 
 function getTime() {
-  return new Date().toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
+  return new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-function toKw(v) {
-  return Number(v || 0) / 1000;
-}
+function toKw(v) { return Number(v || 0) / 1000; }
 
 function timeToSec(t) {
   const p = String(t).substring(0, 8).split(":");
   return (Number(p[0] || 0) * 3600) + (Number(p[1] || 0) * 60) + Number(p[2] || 0);
 }
 
-// ===== Remplir le sélecteur de jour depuis le Sheet =====
 async function loadDays() {
   const select = document.getElementById("daySelect");
   const selected = select.value;
-
   try {
     const res = await fetch(SHEET_URL + "?action=days");
     const json = await res.json();
-
     if (!json.ok) return;
 
     select.innerHTML = "";
-
     const t = todayStr();
     const days = json.days.sort().reverse();
 
     days.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d;
-
       const parts = d.split("-");
-      const y = parts[0];
-      const m = parts[1];
-      const day = parts[2];
-
-      let label = day + "/" + m + "/" + y;
-
-      if (d === t) {
-        label = label + " live";
-      }
-
+      let label = parts[2] + "/" + parts[1] + "/" + parts[0];
+      if (d === t) label += " live";
       opt.textContent = label;
       select.appendChild(opt);
     });
 
-    if (selected) {
-      select.value = selected;
-    }
-
+    if (selected) select.value = selected;
   } catch (err) {
     console.error("Erreur lecture jours :", err);
   }
 }
 
-// ===== Remplir les sélecteurs d'heures =====
 function fillHours() {
   const start = document.getElementById("startHour");
   const end = document.getElementById("endHour");
-
   for (let h = 0; h <= 23; h++) {
     const hh = String(h).padStart(2, "0");
-
     const o1 = document.createElement("option");
-    o1.value = hh;
-    o1.textContent = hh + ":00";
+    o1.value = hh; o1.textContent = hh + ":00";
     start.appendChild(o1);
 
     const o2 = document.createElement("option");
-    o2.value = hh;
-    o2.textContent = hh + ":59";
+    o2.value = hh; o2.textContent = hh + ":59";
     end.appendChild(o2);
   }
-
   start.value = "00";
   end.value = "23";
 }
 
-// ===== Charger le graphique selon jour + période =====
 async function loadChartData() {
   const day = document.getElementById("daySelect").value;
   if (!day) return;
 
   const start = document.getElementById("startHour").value;
   const end = document.getElementById("endHour").value;
-
-  const url = SHEET_URL +
-    "?action=read" +
-    "&date=" + encodeURIComponent(day) +
-    "&start=" + encodeURIComponent(start) +
-    "&end=" + encodeURIComponent(end);
+  const url = SHEET_URL + "?action=read&date=" + encodeURIComponent(day) + "&start=" + encodeURIComponent(start) + "&end=" + encodeURIComponent(end);
 
   try {
     const res = await fetch(url);
     const json = await res.json();
-
-    if (!json.ok) throw new Error("read failed");
-
-    displayChart(json.data);
-
+    if (json.ok) displayChart(json.data);
   } catch (err) {
     console.error("Erreur lecture Sheet :", err);
   }
 }
 
-// ===== Afficher les données + tendance =====
 function displayChart(rows) {
   chart.data.labels = [];
   chart.data.datasets.forEach(ds => ds.data = []);
@@ -283,23 +133,19 @@ function displayChart(rows) {
     chart.data.datasets[0].data.push(h.conso);
     chart.data.datasets[1].data.push(h.prod);
     chart.data.datasets[2].data.push(h.delta);
-    chart.data.datasets[3].data.push(h.g1    || 0);
-    chart.data.datasets[4].data.push(h.g2    || 0);
+    chart.data.datasets[3].data.push(h.g1 || 0);
+    chart.data.datasets[4].data.push(h.g2 || 0);
     chart.data.datasets[5].data.push(h.randa || 0);
-    chart.data.datasets[6].data.push(h.bvm   || 0);
-    chart.data.datasets[7].data.push(h.smt   || 0);
-    chart.data.datasets[8].data.push(h.aux   || 0);
+    chart.data.datasets[6].data.push(h.bvm || 0);
+    chart.data.datasets[7].data.push(h.smt || 0);
+    chart.data.datasets[8].data.push(h.aux || 0);
   });
-
   chart.update();
 
   if (rows.length === 0) {
-    document.getElementById("tConsoMoy").innerText = "---";
-    document.getElementById("tConsoMax").innerText = "---";
-    document.getElementById("tProdMoy").innerText = "---";
-    document.getElementById("tProdMax").innerText = "---";
-    document.getElementById("tEnergie").innerText = "---";
-    document.getElementById("tEnergieProd").innerText = "---";
+    ["tConsoMoy", "tConsoMax", "tProdMoy", "tProdMax", "tEnergie", "tEnergieProd"].forEach(id => {
+      document.getElementById(id).innerText = "---";
+    });
     return;
   }
 
@@ -308,68 +154,48 @@ function displayChart(rows) {
 
   const consoMoy = consoVals.reduce((a, b) => a + b, 0) / consoVals.length;
   const prodMoy = prodVals.reduce((a, b) => a + b, 0) / prodVals.length;
-  const consoMax = Math.max(...consoVals);
-  const prodMax = Math.max(...prodVals);
 
+  let energie = 0, energieProd = 0;
   const MAX_GAP_SEC = 300;
-  let energie = 0;
-  let energieProd = 0;
 
   for (let i = 1; i < rows.length; i++) {
     const dt = timeToSec(rows[i].time) - timeToSec(rows[i - 1].time);
     if (dt <= 0 || dt > MAX_GAP_SEC) continue;
-
     const hours = dt / 3600;
-    energie      += hours * (rows[i].conso + rows[i - 1].conso) / 2;
-    energieProd  += hours * (rows[i].prod  + rows[i - 1].prod)  / 2;
+    energie += hours * (rows[i].conso + rows[i - 1].conso) / 2;
+    energieProd += hours * (rows[i].prod + rows[i - 1].prod) / 2;
   }
 
   document.getElementById("tConsoMoy").innerText = consoMoy.toFixed(2) + " kW";
-  document.getElementById("tConsoMax").innerText = consoMax.toFixed(2) + " kW";
+  document.getElementById("tConsoMax").innerText = Math.max(...consoVals).toFixed(2) + " kW";
   document.getElementById("tProdMoy").innerText = prodMoy.toFixed(2) + " kW";
-  document.getElementById("tProdMax").innerText = prodMax.toFixed(2) + " kW";
+  document.getElementById("tProdMax").innerText = Math.max(...prodVals).toFixed(2) + " kW";
   document.getElementById("tEnergie").innerText = energie.toFixed(1) + " kWh";
   document.getElementById("tEnergieProd").innerText = energieProd.toFixed(1) + " kWh";
 }
 
-// ===== Sauvegarde vers le Sheet =====
 function saveHistory(time, conso, prod, delta, devices) {
   fetch(SHEET_URL, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify({
-      date: todayStr(),
-      time: time,
-      conso: conso,
-      prod: prod,
-      delta: delta,
-      g1: devices.g1,
-      g2: devices.g2,
-      randa: devices.randa,
-      bvm: devices.bvm,
-      smt: devices.smt,
-      aux: devices.aux
+      date: todayStr(), time: time, conso: conso, prod: prod, delta: delta,
+      g1: devices.g1, g2: devices.g2, randa: devices.randa, bvm: devices.bvm, smt: devices.smt, aux: devices.aux
     })
   }).catch(err => console.error("Erreur Sheet :", err));
 }
 
-// ===== Régime STEG =====
 function getStegPeriod() {
   const now = new Date();
   const month = now.getMonth() + 1;
   const t = now.getHours() + now.getMinutes() / 60;
-
-  if (now.getDay() === 0) {
-    return { name: "Nuit (Dimanche)", type: "offpeak" };
-  }
-
+  if (now.getDay() === 0) return { name: "Nuit (Dimanche)", type: "offpeak" };
   if (month >= 9 || month <= 5) {
     if (t >= 21 || t < 7) return { name: "Nuit", type: "offpeak" };
     if (t >= 18) return { name: "Pointe soir", type: "peak" };
     return { name: "Jour", type: "normal" };
   }
-
   if (t >= 22 || t < 6.5) return { name: "Nuit", type: "offpeak" };
   if (t >= 19) return { name: "Pointe soir", type: "peak" };
   if (t >= 8.5 && t < 13.5) return { name: "Pointe matin été", type: "peak" };
@@ -380,7 +206,6 @@ function updateStegUI() {
   const p = getStegPeriod();
   document.getElementById("stegStatus").innerText = p.name;
   const msg = document.getElementById("stegMessage");
-
   if (p.type === "peak") {
     msg.innerText = "⚠️ Pointe tarifaire – Démarrer les groupes en pleine charge";
     msg.style.color = "#ef4444";
@@ -390,34 +215,21 @@ function updateStegUI() {
   }
 }
 
-// ===== Temps réel =====
 async function load() {
   try {
     const res = await fetch(URL, {
       method: "GET",
-      headers: {
-        accesstoken: TOKEN,
-        devicekey: DEVICEKEY,
-        userregion: "us-east-1",
-        "Content-Type": "application/json"
-      }
+      headers: { accesstoken: TOKEN, devicekey: DEVICEKEY, userregion: "us-east-1", "Content-Type": "application/json" }
     });
-
     if (!res.ok) throw new Error("HTTP " + res.status);
 
     const raw = await res.json();
     const map = {};
-
-    raw.forEach(d => {
-      if (!d.deviceId) return;
-      map[d.deviceId] = toKw(d.all_value);
-    });
+    raw.forEach(d => { if (d.deviceId) map[d.deviceId] = toKw(d.all_value); });
 
     const get = id => map[id] || 0;
-
     const g1 = get("W3pGNRR01016");
     const g2 = get("W3pGNRR01017");
-
     const randa = get("W3pGNRR01014");
     const bvm = get("W3pGNRR01015");
     const smt = get("W3pGNRR01013");
@@ -435,55 +247,29 @@ async function load() {
     ORDER.forEach(id => {
       let value = get(id);
       if (id === "W3pGNRR01012") value *= 2;
-
       let display = value.toFixed(2) + " kW";
       if (id === "W3pGNRR01016" || id === "W3pGNRR01017") {
-        const percent = (value / 2250) * 100;
-        display = value.toFixed(2) + " kW (" + percent.toFixed(1) + "%)";
+        display += " (" + ((value / 2250) * 100).toFixed(1) + "%)";
       }
-
-      html += `
-        <div class="device">
-          <b>${NAME[id]}</b><br>
-          ${display}
-        </div>
-      `;
+      html += `<div class="device"><b>${NAME[id]}</b><br>${display}</div>`;
     });
 
     document.getElementById("devices").innerHTML = html;
-
-    saveHistory(getTime(), conso, prod, delta, {
-      g1: g1,
-      g2: g2,
-      randa: randa,
-      bvm: bvm,
-      smt: smt,
-      aux: aux
-    });
-
+    saveHistory(getTime(), conso, prod, delta, { g1, g2, randa, bvm, smt, aux });
     updateStegUI();
 
   } catch (err) {
     console.error("Erreur API :", err);
-    document.getElementById("stegMessage").innerText = "❌ Impossible de récupérer les données.";
+    document.getElementById("stegMessage").innerText = "❌ Impossible de récupérer les données WattNow.";
     document.getElementById("stegMessage").style.color = "#ef4444";
   }
 }
 
-// ===== Initialisation =====
 fillHours();
 loadDays();
 load();
 
 setTimeout(loadChartData, 1500);
-
-// Rafraîchissements automatiques
 setInterval(load, 10000);
-
-setInterval(() => {
-  if (document.getElementById("daySelect").value === todayStr()) {
-    loadChartData();
-  }
-}, 10000);
-
+setInterval(() => { if (document.getElementById("daySelect").value === todayStr()) loadChartData(); }, 10000);
 setInterval(loadDays, 3600000);
