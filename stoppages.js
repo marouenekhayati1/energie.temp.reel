@@ -26,7 +26,7 @@ function fmtNum(n) {
   return Number(n || 0).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function initStoppagesPage() {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
@@ -36,18 +36,27 @@ document.addEventListener("DOMContentLoaded", () => {
     yearSelect.innerHTML = "";
     for (let y = year; y >= 2024; y--) {
       const opt = document.createElement("option");
-      opt.value = y; opt.textContent = y;
+      opt.value = y;
+      opt.textContent = y;
       yearSelect.appendChild(opt);
     }
     yearSelect.value = year;
   }
 
   const monthInput = document.getElementById("monthSelect");
-  if (monthInput) monthInput.value = `${year}-${month}`;
+  if (monthInput) {
+    monthInput.value = `${year}-${month}`;
+  }
 
   loadYearlyData();
   loadStoppagesData();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initStoppagesPage);
+} else {
+  initStoppagesPage();
+}
 
 async function loadYearlyData() {
   const yearSelect = document.getElementById("yearSelect");
@@ -151,7 +160,6 @@ function processAndDisplayStoppages(monthData) {
   const g1Stoppages = [], g2Stoppages = [];
   const POWER_THRESHOLD = 0.4; // Seuil < 400 W
 
-  // État conservé entre les jours pour gérer les arrêts passant minuit
   let g1Start = null;
   let g2Start = null;
   let lastPoint = null;
@@ -167,7 +175,6 @@ function processAndDisplayStoppages(monthData) {
       const curMs = toTimestampMs(dateStr, r.time);
       lastPoint = { date: dateStr, time: r.time, ms: curMs };
 
-      // Suivi Groupe 1
       if (r.g1 < POWER_THRESHOLD && g1Start === null) {
         g1Start = { date: dateStr, time: r.time, ms: curMs };
       } else if (r.g1 >= POWER_THRESHOLD && g1Start !== null) {
@@ -175,7 +182,6 @@ function processAndDisplayStoppages(monthData) {
         g1Start = null;
       }
 
-      // Suivi Groupe 2
       if (r.g2 < POWER_THRESHOLD && g2Start === null) {
         g2Start = { date: dateStr, time: r.time, ms: curMs };
       } else if (r.g2 >= POWER_THRESHOLD && g2Start !== null) {
@@ -185,7 +191,6 @@ function processAndDisplayStoppages(monthData) {
     }
   });
 
-  // Clôture d'un arrêt toujours en cours à la fin de la période chargée
   if (g1Start !== null && lastPoint !== null) {
     evaluateAndPush(g1Stoppages, g1Start, lastPoint);
   }
