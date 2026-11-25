@@ -21,7 +21,7 @@
   <div class="controls">
     <label for="yearSelect">📅 Sélectionner une Année :</label>
     <select id="yearSelect" onchange="loadYearlyData()"></select>
-    <button onclick="loadYearlyData()">🔍 Charger l'Année</button>
+    <button onclick="loadYearlyData()">🔄 Actualiser</button>
   </div>
 
   <div class="table-container" style="margin-top: 15px; max-height: 450px;">
@@ -40,7 +40,7 @@
         </tr>
       </thead>
       <tbody id="yearlyTableBody">
-        <tr><td colspan="9">Sélectionnez une année</td></tr>
+        <tr><td colspan="9">Chargement des données en cours...</td></tr>
       </tbody>
       <tfoot id="yearlyTableFoot"></tfoot>
     </table>
@@ -50,11 +50,11 @@
 <!-- SECTION 2 : ANALYSE MENSUELLE DES ARRÊTS -->
 <div class="card" style="margin-top: 25px;">
   <h2 style="text-align: left;">🛑 Suivi Mensuel des Arrêts (G1 & G2)</h2>
-  
+
   <div class="controls">
     <label for="monthSelect">📅 Sélectionner un Mois :</label>
     <input type="month" id="monthSelect" onchange="loadStoppagesData()">
-    <button onclick="loadStoppagesData()">🔍 Analyser le Mois</button>
+    <button onclick="loadStoppagesData()">🔄 Actualiser</button>
   </div>
 
   <!-- Totaux Mensuels Arrêts -->
