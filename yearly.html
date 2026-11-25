@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>📊 Bilan Énergétique Annuel - WattNow</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="header-nav">
+  <h1>📊 Bilan Énergétique Annuel</h1>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <a href="index.html" class="nav-btn">⚡ Dashboard</a>
+    <a href="stoppages.html" class="nav-btn">🛑 Suivi des Arrêts</a>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="text-align: left;">📅 Récapitulatif Mensuel par Année</h2>
+
+  <div class="controls">
+    <label for="yearSelect">📅 Sélectionner une Année :</label>
+    <select id="yearSelect" onchange="loadYearlyData()"></select>
+  </div>
+
+  <div class="table-container" style="margin-top: 15px; max-height: 550px;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Mois</th>
+          <th>Conso Totale (kWh)</th>
+          <th>Prod Totale (kWh)</th>
+          <th>Groupe 1 (kWh)</th>
+          <th>Groupe 2 (kWh)</th>
+          <th>Randa (kWh)</th>
+          <th>BVM (kWh)</th>
+          <th>SMT (kWh)</th>
+          <th>Auxiliaire (kWh)</th>
+        </tr>
+      </thead>
+      <tbody id="yearlyTableBody">
+        <tr><td colspan="9">Chargement des données en cours...</td></tr>
+      </tbody>
+      <tfoot id="yearlyTableFoot"></tfoot>
+    </table>
+  </div>
+</div>
+
+<script src="yearly.js"></script>
+
+</body>
+</html>
