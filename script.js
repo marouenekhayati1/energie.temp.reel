@@ -3,7 +3,7 @@ const TOKEN = "eyJraWQiOiJ0Z0NRSUg5U3hlZW9jcWdLWjV0aXFpbVZzOFlMV1hLTnJhOWMzcUNZV
 const DEVICEKEY = "us-east-1_cd592adc-1b14-4f9e-a91c-76deb7c9fe24";
 
 const URL = "https://uufyt92ekc.execute-api.us-east-1.amazonaws.com/prod/apis.wattnow.io/dashboard/realtime/devices/lastValuesByDeviceType/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/us-east-1:2e44f066-1ee0-4353-9885-97ee102980bc/tri";
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyVTCm1Y4NQwq0GhGUBLmZLyR0u2GH_9Bsl1PZ1O7QXhJYydn6Hms0ZCKsveDhYIPj9/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyg8hhIGg9JvDR-EqSYjOLIM_GAGRkzlRuDCWPF_jMRyWKGI6FT6stFp5aVxs8TY_TWAw/exec";
 
 const ORDER = ["W3pGNRR01016", "W3pGNRR01017", "W3pGNRR01014", "W3pGNRR01015", "W3pGNRR01013", "W3pGNRR01012"];
 const NAME = {
