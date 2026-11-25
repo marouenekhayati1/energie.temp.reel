@@ -6,9 +6,9 @@ const MONTH_NAMES = {
   "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre"
 };
 
-function timeToSec(t) {
-  const p = String(t).substring(0, 8).split(":");
-  return (Number(p[0] || 0) * 3600) + (Number(p[1] || 0) * 60) + Number(p[2] || 0);
+function toTimestampMs(dateStr, timeStr) {
+  const cleanTime = String(timeStr).substring(0, 8).padStart(8, "0");
+  return new Date(`${dateStr}T${cleanTime}`).getTime();
 }
 
 function formatDuration(sec) {
@@ -151,38 +151,47 @@ function processAndDisplayStoppages(monthData) {
   const g1Stoppages = [], g2Stoppages = [];
   const POWER_THRESHOLD = 0.4; // Seuil < 400 W
 
-  Object.keys(monthData).sort().forEach(dateStr => {
+  // État conservé entre les jours pour gérer les arrêts passant minuit
+  let g1Start = null;
+  let g2Start = null;
+  let lastPoint = null;
+
+  const sortedDates = Object.keys(monthData).sort();
+
+  sortedDates.forEach(dateStr => {
     const rows = monthData[dateStr];
     if (!rows || rows.length === 0) return;
 
-    let g1Start = null, g2Start = null;
-
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
-      const curSec = timeToSec(r.time);
+      const curMs = toTimestampMs(dateStr, r.time);
+      lastPoint = { date: dateStr, time: r.time, ms: curMs };
 
-      if (r.g1 < POWER_THRESHOLD && g1Start === null) g1Start = { time: r.time, sec: curSec };
-      else if (r.g1 >= POWER_THRESHOLD && g1Start !== null) {
-        evaluateAndPush(g1Stoppages, dateStr, g1Start.time, r.time, curSec - g1Start.sec);
+      // Suivi Groupe 1
+      if (r.g1 < POWER_THRESHOLD && g1Start === null) {
+        g1Start = { date: dateStr, time: r.time, ms: curMs };
+      } else if (r.g1 >= POWER_THRESHOLD && g1Start !== null) {
+        evaluateAndPush(g1Stoppages, g1Start, { date: dateStr, time: r.time, ms: curMs });
         g1Start = null;
       }
 
-      if (r.g2 < POWER_THRESHOLD && g2Start === null) g2Start = { time: r.time, sec: curSec };
-      else if (r.g2 >= POWER_THRESHOLD && g2Start !== null) {
-        evaluateAndPush(g2Stoppages, dateStr, g2Start.time, r.time, curSec - g2Start.sec);
+      // Suivi Groupe 2
+      if (r.g2 < POWER_THRESHOLD && g2Start === null) {
+        g2Start = { date: dateStr, time: r.time, ms: curMs };
+      } else if (r.g2 >= POWER_THRESHOLD && g2Start !== null) {
+        evaluateAndPush(g2Stoppages, g2Start, { date: dateStr, time: r.time, ms: curMs });
         g2Start = null;
       }
     }
-
-    if (g1Start !== null) {
-      const lastRow = rows[rows.length - 1];
-      evaluateAndPush(g1Stoppages, dateStr, g1Start.time, lastRow.time, timeToSec(lastRow.time) - g1Start.sec);
-    }
-    if (g2Start !== null) {
-      const lastRow = rows[rows.length - 1];
-      evaluateAndPush(g2Stoppages, dateStr, g2Start.time, lastRow.time, timeToSec(lastRow.time) - g2Start.sec);
-    }
   });
+
+  // Clôture d'un arrêt toujours en cours à la fin de la période chargée
+  if (g1Start !== null && lastPoint !== null) {
+    evaluateAndPush(g1Stoppages, g1Start, lastPoint);
+  }
+  if (g2Start !== null && lastPoint !== null) {
+    evaluateAndPush(g2Stoppages, g2Start, lastPoint);
+  }
 
   renderStoppageTable("g1TableBody", g1Stoppages);
   renderStoppageTable("g2TableBody", g2Stoppages);
@@ -190,11 +199,23 @@ function processAndDisplayStoppages(monthData) {
   updateStoppageTotals("g2TotCorr", "g2TotPrev", g2Stoppages);
 }
 
-function evaluateAndPush(list, dateStr, startTime, endTime, durationSec) {
+function evaluateAndPush(list, startObj, endObj) {
+  const durationSec = Math.max(0, (endObj.ms - startObj.ms) / 1000);
   const durationMin = durationSec / 60;
   if (durationMin < 3) return; // < 3 min ignoré
+
   const type = durationMin <= 90 ? "Correctif" : "Préventif";
-  list.push({ date: dateStr, start: startTime, end: endTime, durationSec: durationSec, type: type });
+  const displayDate = startObj.date === endObj.date
+    ? startObj.date
+    : `${startObj.date} → ${endObj.date}`;
+
+  list.push({
+    date: displayDate,
+    start: startObj.time,
+    end: endObj.time,
+    durationSec: durationSec,
+    type: type
+  });
 }
 
 function renderStoppageTable(elementId, stoppages) {
