@@ -3,52 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>🛑 Suivi des Arrêts & Bilan Mensuel - WattNow</title>
+<title>🛑 Suivi des Arrêts - WattNow</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="header-nav">
-  <h1>🛑 Suivi des Arrêts & Bilan Mensuel</h1>
-  <a href="index.html" class="nav-btn">⚡ Retour au Dashboard</a>
+  <h1>🛑 Suivi des Arrêts (G1 & G2)</h1>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <a href="index.html" class="nav-btn">⚡ Dashboard</a>
+    <a href="yearly.html" class="nav-btn">📊 Bilan Annuel</a>
+  </div>
 </div>
 
-<!-- SECTION 1 : RECAPITULATIF MENSUEL PAR ANNÉE -->
 <div class="card">
-  <h2 style="text-align: left;">📊 Bilan Énergétique Mensuel</h2>
-
-  <div class="controls">
-    <label for="yearSelect">📅 Sélectionner une Année :</label>
-    <select id="yearSelect" onchange="loadYearlyData()"></select>
-  </div>
-
-  <div class="table-container" style="margin-top: 15px; max-height: 450px;">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Mois</th>
-          <th>Conso Totale (kWh)</th>
-          <th>Prod Totale (kWh)</th>
-          <th>Groupe 1 (kWh)</th>
-          <th>Groupe 2 (kWh)</th>
-          <th>Randa (kWh)</th>
-          <th>BVM (kWh)</th>
-          <th>SMT (kWh)</th>
-          <th>Auxiliaire (kWh)</th>
-        </tr>
-      </thead>
-      <tbody id="yearlyTableBody">
-        <tr><td colspan="9">Chargement des données en cours...</td></tr>
-      </tbody>
-      <tfoot id="yearlyTableFoot"></tfoot>
-    </table>
-  </div>
-</div>
-
-<!-- SECTION 2 : ANALYSE MENSUELLE DES ARRÊTS -->
-<div class="card" style="margin-top: 25px;">
-  <h2 style="text-align: left;">🛑 Suivi Mensuel des Arrêts (G1 & G2)</h2>
+  <h2 style="text-align: left;">🛑 Analyse Mensuelle des Arrêts</h2>
 
   <div class="controls">
     <label for="monthSelect">📅 Sélectionner un Mois :</label>
