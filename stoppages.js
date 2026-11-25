@@ -1,14 +1,7 @@
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyg8hhIGg9JvDR-EqSYjOLIM_GAGRkzlRuDCWPF_jMRyWKGI6FT6stFp5aVxs8TY_TWAw/exec";
-
-
-const MONTH_NAMES = {
-  "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril",
-  "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août",
-  "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre"
-};
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzlRCv9mpWRrQ_XT0R5bmlCJAKrl9xjFmxCuPVdeMXk8OUk5fgkRpaD6bGLAZXfrVtFqQ/exec";
 
 function toTimestampMs(dateStr, timeStr) {
-  const cleanTime = String(timeStr).substring(0, 8).padStart(8, "0");
+  const cleanTime = String(timeStr || "00:00:00").substring(0, 8).padStart(8, "0");
   return new Date(`${dateStr}T${cleanTime}`).getTime();
 }
 
@@ -23,33 +16,16 @@ function formatDuration(sec) {
   return res;
 }
 
-function fmtNum(n) {
-  return Number(n || 0).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-}
-
 function initStoppagesPage() {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
-
-  const yearSelect = document.getElementById("yearSelect");
-  if (yearSelect) {
-    yearSelect.innerHTML = "";
-    for (let y = year; y >= 2024; y--) {
-      const opt = document.createElement("option");
-      opt.value = y;
-      opt.textContent = y;
-      yearSelect.appendChild(opt);
-    }
-    yearSelect.value = year;
-  }
 
   const monthInput = document.getElementById("monthSelect");
   if (monthInput) {
     monthInput.value = `${year}-${month}`;
   }
 
-  loadYearlyData();
   loadStoppagesData();
 }
 
@@ -57,78 +33,6 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initStoppagesPage);
 } else {
   initStoppagesPage();
-}
-
-async function loadYearlyData() {
-  const yearSelect = document.getElementById("yearSelect");
-  if (!yearSelect || !yearSelect.value) return;
-
-  const year = yearSelect.value;
-  const tbody = document.getElementById("yearlyTableBody");
-  const tfoot = document.getElementById("yearlyTableFoot");
-
-  tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 15px;">Chargement des données en cours...</td></tr>';
-  tfoot.innerHTML = '';
-
-  const url = SHEET_URL + "?action=yearly&year=" + encodeURIComponent(year);
-
-  try {
-    const res = await fetch(url);
-    const json = await res.json();
-    if (!json.ok || !json.monthly) throw new Error(json.error || "Données indisponibles");
-
-    const mStats = json.monthly;
-    tbody.innerHTML = "";
-
-    let totConso = 0, totProd = 0, totG1 = 0, totG2 = 0;
-    let totRanda = 0, totBvm = 0, totSmt = 0, totAux = 0;
-
-    for (let m = 12; m >= 1; m--) {
-      const mKey = String(m).padStart(2, "0");
-      const d = mStats[mKey] || { conso: 0, prod: 0, g1: 0, g2: 0, randa: 0, bvm: 0, smt: 0, aux: 0 };
-
-      totConso += d.conso || 0;
-      totProd  += d.prod || 0;
-      totG1    += d.g1 || 0;
-      totG2    += d.g2 || 0;
-      totRanda += d.randa || 0;
-      totBvm   += d.bvm || 0;
-      totSmt   += d.smt || 0;
-      totAux   += d.aux || 0;
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${MONTH_NAMES[mKey]}</b></td>
-        <td class="text-conso">${fmtNum(d.conso)}</td>
-        <td class="text-prod">${fmtNum(d.prod)}</td>
-        <td>${fmtNum(d.g1)}</td>
-        <td>${fmtNum(d.g2)}</td>
-        <td>${fmtNum(d.randa)}</td>
-        <td>${fmtNum(d.bvm)}</td>
-        <td>${fmtNum(d.smt)}</td>
-        <td>${fmtNum(d.aux)}</td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    tfoot.innerHTML = `
-      <tr>
-        <td><b>TOTAL ANNUEL (${year})</b></td>
-        <td class="text-conso">${fmtNum(totConso)}</td>
-        <td class="text-prod">${fmtNum(totProd)}</td>
-        <td>${fmtNum(totG1)}</td>
-        <td>${fmtNum(totG2)}</td>
-        <td>${fmtNum(totRanda)}</td>
-        <td>${fmtNum(totBvm)}</td>
-        <td>${fmtNum(totSmt)}</td>
-        <td>${fmtNum(totAux)}</td>
-      </tr>
-    `;
-
-  } catch (err) {
-    console.error("Erreur bilan annuel :", err);
-    tbody.innerHTML = `<tr><td colspan="9" style="color:#ef4444; text-align:center; padding: 15px;">❌ Erreur : ${err.message}. Assurez-vous de redéployer Google Apps Script.</td></tr>`;
-  }
 }
 
 async function loadStoppagesData() {
@@ -142,24 +46,25 @@ async function loadStoppagesData() {
   if (g1Body) g1Body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Chargement...</td></tr>';
   if (g2Body) g2Body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Chargement...</td></tr>';
 
-  const url = SHEET_URL + "?action=stoppages&month=" + encodeURIComponent(month);
+  const url = `${SHEET_URL}?action=stoppages&month=${encodeURIComponent(month)}&_t=${Date.now()}`;
 
   try {
     const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    if (!json.ok) throw new Error("Erreur serveur");
+    if (!json.ok || !json.data) throw new Error(json.error || "Données d'arrêts indisponibles");
 
     processAndDisplayStoppages(json.data);
   } catch (err) {
     console.error("Erreur arrêts :", err);
-    if (g1Body) g1Body.innerHTML = '<tr><td colspan="5" style="color:#ef4444; text-align:center;">Erreur de chargement</td></tr>';
-    if (g2Body) g2Body.innerHTML = '<tr><td colspan="5" style="color:#ef4444; text-align:center;">Erreur de chargement</td></tr>';
+    if (g1Body) g1Body.innerHTML = `<tr><td colspan="5" style="color:#ef4444; text-align:center;">❌ ${err.message}</td></tr>`;
+    if (g2Body) g2Body.innerHTML = `<tr><td colspan="5" style="color:#ef4444; text-align:center;">❌ ${err.message}</td></tr>`;
   }
 }
 
 function processAndDisplayStoppages(monthData) {
   const g1Stoppages = [], g2Stoppages = [];
-  const POWER_THRESHOLD = 0.4; // Seuil < 400 W
+  const POWER_THRESHOLD = 0.4;
 
   let g1Start = null;
   let g2Start = null;
@@ -174,6 +79,8 @@ function processAndDisplayStoppages(monthData) {
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       const curMs = toTimestampMs(dateStr, r.time);
+      if (Number.isNaN(curMs)) continue;
+
       lastPoint = { date: dateStr, time: r.time, ms: curMs };
 
       if (r.g1 < POWER_THRESHOLD && g1Start === null) {
@@ -208,7 +115,7 @@ function processAndDisplayStoppages(monthData) {
 function evaluateAndPush(list, startObj, endObj) {
   const durationSec = Math.max(0, (endObj.ms - startObj.ms) / 1000);
   const durationMin = durationSec / 60;
-  if (durationMin < 3) return; // < 3 min ignoré
+  if (durationMin < 3) return;
 
   const type = durationMin <= 90 ? "Correctif" : "Préventif";
   const displayDate = startObj.date === endObj.date
